@@ -104,9 +104,11 @@ body {
 .ai-chat-wrap {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 130px);
+  height: calc(100dvh - 130px - var(--safe-top) - var(--safe-bottom));
   padding: 0;
   margin: -16px;
+  position: relative;
+  overflow: hidden;
 }
 .ai-messages {
   flex: 1;
@@ -119,26 +121,42 @@ body {
 }
 .ai-welcome {
   text-align: center;
-  padding: 24px 16px;
+  padding: 32px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: aiFadeIn 0.4s ease-out;
 }
-.ai-welcome-icon {
-  width: 56px; height: 56px;
-  background: var(--accent-bg);
-  border-radius: 16px;
+@keyframes aiFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-welcome-avatar {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--accent), #1A73E8);
+  border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 12px;
+  margin: 0 auto 14px;
+  position: relative;
 }
-.ai-welcome-icon svg {
-  width: 28px; height: 28px;
-  stroke: var(--accent);
+.ai-welcome-avatar svg {
+  width: 24px; height: 24px;
+}
+.ai-status-dot {
+  position: absolute;
+  bottom: 1px; right: 1px;
+  width: 11px; height: 11px;
+  background: #34C759;
+  border-radius: 50%;
+  border: 2.5px solid var(--surface);
 }
 .ai-welcome-title {
-  font-size: 16px; font-weight: 600;
-  color: var(--text); margin-bottom: 6px;
+  font-size: 18px; font-weight: 600;
+  color: var(--text); margin-bottom: 4px;
 }
 .ai-welcome-sub {
   font-size: 13px; color: var(--text-2);
-  line-height: 1.5; max-width: 280px; margin: 0 auto 16px;
+  line-height: 1.5; max-width: 260px; margin: 0 auto 18px;
 }
 .ai-chips {
   display: flex; flex-wrap: wrap;
@@ -147,19 +165,31 @@ body {
 .ai-chip {
   background: var(--surface-2);
   border: 0.5px solid var(--surface-3);
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 12px;
+  border-radius: 18px;
+  padding: 7px 13px;
+  font-size: 12.5px;
   color: var(--text);
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.1s;
+  transition: background 0.1s, transform 0.1s;
+  display: flex; align-items: center; gap: 5px;
 }
-.ai-chip:active { opacity: 0.7; }
+.ai-chip:active { opacity: 0.7; transform: scale(0.96); }
+.ai-chip-icon {
+  font-size: 13px;
+  display: inline-flex;
+}
+
+/* Chat messages */
 .ai-msg {
   display: flex;
   gap: 8px;
   align-items: flex-start;
+  animation: aiMsgIn 0.25s ease-out;
+}
+@keyframes aiMsgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .ai-msg--user {
   flex-direction: row-reverse;
@@ -168,7 +198,7 @@ body {
   max-width: 82%;
   padding: 10px 13px;
   border-radius: 14px;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
@@ -176,33 +206,66 @@ body {
 .ai-msg--user .ai-msg-bubble {
   background: var(--accent);
   color: #fff;
-  border-radius: 14px 14px 4px 14px;
+  border-radius: 16px 16px 4px 16px;
 }
 .ai-msg--ai .ai-msg-bubble {
   background: var(--surface);
   border: 0.5px solid var(--surface-3);
   color: var(--text);
-  border-radius: 14px 14px 14px 4px;
+  border-radius: 4px 16px 16px 16px;
 }
 .ai-msg-avatar {
   width: 28px; height: 28px;
   border-radius: 50%;
-  background: var(--accent-bg);
+  background: linear-gradient(135deg, var(--accent), #1A73E8);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   margin-top: 2px;
 }
 .ai-msg-avatar svg {
-  width: 14px; height: 14px;
-  stroke: var(--accent);
+  width: 13px; height: 13px;
+  stroke: #fff;
 }
+.ai-msg-time {
+  font-size: 10.5px;
+  color: var(--text-2);
+  margin-top: 3px;
+  opacity: 0.7;
+}
+.ai-msg--user .ai-msg-time { text-align: right; }
+.ai-msg--ai .ai-msg-time { padding-left: 36px; }
+
+/* AI response sections */
+.ai-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ai-stat-card {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.ai-stat-card__label {
+  font-size: 10.5px;
+  color: var(--text-2);
+  margin-bottom: 2px;
+}
+.ai-stat-card__value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Typing indicator */
 .ai-typing {
   display: flex;
   gap: 4px;
   padding: 12px 14px;
   background: var(--surface);
   border: 0.5px solid var(--surface-3);
-  border-radius: 14px 14px 14px 4px;
+  border-radius: 4px 16px 16px 16px;
   width: fit-content;
 }
 .ai-typing span {
@@ -217,22 +280,52 @@ body {
   0%,80%,100%{opacity:0.3;transform:scale(0.8)}
   40%{opacity:1;transform:scale(1)}
 }
+
+/* Clear chat button */
+.ai-clear-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 0.5px solid var(--surface-3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.ai-clear-btn.visible { opacity: 1; pointer-events: auto; }
+.ai-clear-btn:active { transform: scale(0.92); }
+.ai-clear-btn svg { width: 14px; height: 14px; stroke: var(--text-2); }
 .ai-input-row {
   display: flex;
   gap: 8px;
   align-items: flex-end;
-  padding: 10px 16px;
-  padding-bottom: calc(10px + var(--safe-bottom));
-  border-top: 0.5px solid var(--surface-3);
+  padding: 8px 12px 12px;
+  padding-bottom: calc(12px + var(--safe-bottom));
   background: var(--surface);
+  flex-shrink: 0;
 }
-.ai-input {
+.ai-input-pill {
   flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
   background: var(--surface-2);
   border: 0.5px solid var(--surface-3);
-  border-radius: 20px;
-  padding: 10px 14px;
-  font-size: 14px;
+  border-radius: 22px;
+  padding: 4px 6px 4px 14px;
+  transition: border-color 0.15s;
+}
+.ai-input-pill:focus-within { border-color: var(--accent); }
+.ai-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  font-size: 16px;
   color: var(--text);
   resize: none;
   outline: none;
@@ -240,10 +333,125 @@ body {
   line-height: 1.4;
   max-height: 120px;
   overflow-y: auto;
-  transition: border-color 0.15s;
+  -webkit-appearance: none;
 }
-.ai-input:focus { border-color: var(--accent); }
 .ai-input::placeholder { color: var(--text-2); }
+
+/* Voice button — inside pill */
+.ai-voice-btn {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  background: transparent;
+}
+.ai-voice-btn:active { transform: scale(0.9); }
+.ai-voice-btn svg { width: 18px; height: 18px; stroke: var(--text-2); }
+.ai-voice-btn.recording {
+  background: var(--danger);
+  animation: voicePulse 1.2s ease-in-out infinite;
+}
+.ai-voice-btn.recording .mic-icon { display: none; }
+.ai-voice-btn.recording .stop-icon { display: block; stroke: #fff; }
+@keyframes voicePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+}
+
+/* Voice recording overlay */
+.ai-voice-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 0.5px solid var(--surface-3);
+  padding: 16px 16px calc(16px + var(--safe-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 5;
+  animation: slideUp 0.2s ease-out;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.ai-voice-wave {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  height: 32px;
+}
+.ai-voice-wave span {
+  width: 3px;
+  background: var(--danger);
+  border-radius: 2px;
+  animation: waveBar 0.8s ease-in-out infinite;
+}
+.ai-voice-wave span:nth-child(1) { height: 12px; animation-delay: 0s; }
+.ai-voice-wave span:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+.ai-voice-wave span:nth-child(3) { height: 28px; animation-delay: 0.2s; }
+.ai-voice-wave span:nth-child(4) { height: 20px; animation-delay: 0.3s; }
+.ai-voice-wave span:nth-child(5) { height: 12px; animation-delay: 0.4s; }
+@keyframes waveBar {
+  0%,100% { transform: scaleY(0.5); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+.ai-voice-status {
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 500;
+}
+.ai-voice-timer {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.ai-voice-preview {
+  font-size: 13px;
+  color: var(--text-2);
+  text-align: center;
+  max-width: 280px;
+  min-height: 18px;
+  line-height: 1.4;
+}
+.ai-voice-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+.ai-voice-cancel,
+.ai-voice-send {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.ai-voice-cancel:active, .ai-voice-send:active { transform: scale(0.96); }
+.ai-voice-cancel {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.ai-voice-cancel svg { width: 14px; height: 14px; stroke: var(--text-2); }
+.ai-voice-send {
+  background: var(--accent);
+  color: #fff;
+}
+.ai-voice-send svg { width: 14px; height: 14px; stroke: #fff; }
+.ai-voice-send:disabled { opacity: 0.4; pointer-events: none; }
+
+/* Send button */
 .ai-send-btn {
   width: 40px; height: 40px;
   background: var(--accent);
@@ -252,6 +460,8 @@ body {
   flex-shrink: 0;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
+  border: none;
+  margin-bottom: 2px;
 }
 .ai-send-btn:active { opacity: 0.8; transform: scale(0.94); }
 .ai-send-btn svg {
@@ -259,29 +469,6 @@ body {
   stroke: #fff;
 }
 .ai-send-btn:disabled { opacity: 0.4; pointer-events: none; }
-
-/* Voice button */
-.ai-voice-btn {
-  width: 40px; height: 40px;
-  background: var(--surface-2);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: none;
-}
-.ai-voice-btn:active { transform: scale(0.94); }
-.ai-voice-btn svg { width: 16px; height: 16px; stroke: var(--text-2); }
-.ai-voice-btn.recording {
-  background: var(--danger);
-  animation: voicePulse 1s ease-in-out infinite;
-}
-.ai-voice-btn.recording svg { stroke: #fff; }
-@keyframes voicePulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(255,59,48,0); }
-}
 
 /* AI chart inside bubble */
 .ai-chart-wrap {
@@ -2245,22 +2432,45 @@ body {
         <div class="ai-chat-wrap" id="aiChatWrap">
           <div class="ai-messages" id="aiMessages">
             <div class="ai-welcome">
-              <div class="ai-welcome-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+              <div class="ai-welcome-avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>
+                <span class="ai-status-dot"></span>
               </div>
-              <div class="ai-welcome-title">Nina AI Yordamchi</div>
-              <div class="ai-welcome-sub">Statistika, tahlil, xabar yuborish va bonus/jarima qo'shish buyrug'ingizni bajaraman</div>
+              <div class="ai-welcome-title" id="aiWelcomeTitle">Salom!</div>
+              <div class="ai-welcome-sub" id="aiWelcomeSub">Buyruqlaringizni bajarishga tayyorman</div>
               <div class="ai-chips" id="aiChips"></div>
             </div>
           </div>
           <div class="ai-input-row">
-            <button class="ai-voice-btn" id="aiVoiceBtn" onclick="Pages.ai.toggleVoice()" aria-label="Ovozli xabar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </button>
-            <textarea class="ai-input" id="aiInput" placeholder="Buyruq yozing..." rows="1" oninput="Pages.ai.autoResize(this)" onkeydown="Pages.ai.onKeyDown(event)"></textarea>
+            <div class="ai-input-pill" id="aiInputPill">
+              <textarea class="ai-input" id="aiInput" placeholder="Buyruq yozing..." rows="1" oninput="Pages.ai.autoResize(this)" onkeydown="Pages.ai.onKeyDown(event)"></textarea>
+              <button class="ai-voice-btn" id="aiVoiceBtn" onclick="Pages.ai.toggleVoice()" aria-label="Ovozli xabar">
+                <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <svg class="stop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+              </button>
+            </div>
             <button class="ai-send-btn" id="aiSendBtn" onclick="Pages.ai.send()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
+          </div>
+          <!-- Voice recording overlay -->
+          <div class="ai-voice-overlay hidden" id="aiVoiceOverlay">
+            <div class="ai-voice-wave" id="aiVoiceWave">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="ai-voice-status" id="aiVoiceStatus">Tinglayapman...</div>
+            <div class="ai-voice-timer" id="aiVoiceTimer">0:00</div>
+            <div class="ai-voice-preview" id="aiVoicePreview"></div>
+            <div class="ai-voice-actions">
+              <button class="ai-voice-cancel" onclick="Pages.ai.cancelVoice()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Bekor
+              </button>
+              <button class="ai-voice-send" id="aiVoiceSendBtn" onclick="Pages.ai.sendVoice()" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                Yuborish
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -6907,22 +7117,77 @@ const Pages = {
     _loading: false,
     _initialized: false,
     _dbContext: null,
-    _avatarSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>',
+    _avatarSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>',
 
     _chips: [
-      { label: '\u{1F4CA} Bugungi hisobot', text: 'Bugungi hisobotni ber' },
-      { label: '\u{1F4C8} Haftalik grafik', text: 'Oxirgi 7 kunlik grafik ko\'rsat' },
-      { label: '\u{1F3ED} Bo\'limlar tahlili', text: 'Bo\'limlar taqqoslamasini ko\'rsat' },
-      { label: '\u{1F4E6} Mahsulot trendlari', text: 'Mahsulot trendlarini ko\'rsat' },
-      { label: '\u{1F4AC} Hammaga xabar', text: 'Barcha ishchilarga xabar yuborib ber' },
+      { icon: '📊', label: 'Bugungi hisobot', text: 'Bugungi hisobotni ber' },
+      { icon: '📈', label: 'Haftalik grafik', text: 'Oxirgi 7 kunlik grafik ko\'rsat' },
+      { icon: '🏭', label: 'Bo\'limlar tahlili', text: 'Bo\'limlar taqqoslamasini ko\'rsat' },
+      { icon: '📦', label: 'Mahsulot trendlari', text: 'Mahsulot trendlarini ko\'rsat' },
+      { icon: '👥', label: 'Ishchilar ro\'yxati', text: 'Faol ishchilar ro\'yxatini ko\'rsat' },
     ],
+
+    _getGreeting() {
+      const h = new Date().getHours();
+      const name = State.admin?.full_name?.split(' ')[0] || State.user?.first_name || '';
+      let greeting;
+      if (h >= 5 && h < 12) greeting = 'Xayrli tong';
+      else if (h >= 12 && h < 18) greeting = 'Xayrli kun';
+      else if (h >= 18 && h < 22) greeting = 'Xayrli kech';
+      else greeting = 'Salom';
+      return name ? greeting + ', ' + name + '!' : greeting + '!';
+    },
+
+    _getSubtext() {
+      const h = new Date().getHours();
+      if (h >= 5 && h < 12) return 'Bugungi ish kunini nima bilan boshlaymiz?';
+      if (h >= 12 && h < 18) return 'Qanday yordam beray?';
+      if (h >= 18 && h < 22) return 'Bugungi natijalarni ko\'rib chiqamizmi?';
+      return 'Buyruqlaringizni bajarishga tayyorman';
+    },
+
+    _formatTime(date) {
+      if (!date) date = new Date();
+      const h = date.getHours();
+      const m = date.getMinutes();
+      return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    },
 
     onEnter() {
       if (!Pages.ai._initialized) {
         Pages.ai._initChips();
         Pages.ai._initialized = true;
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', Pages.ai._onViewportResize);
+        }
       }
+      // Har safar kirganda greeting yangilansin
+      const title = document.getElementById('aiWelcomeTitle');
+      const sub = document.getElementById('aiWelcomeSub');
+      if (title) title.textContent = Pages.ai._getGreeting();
+      if (sub) sub.textContent = Pages.ai._getSubtext();
+
       Pages.ai.renderMessages();
+    },
+
+    onLeave() {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', Pages.ai._onViewportResize);
+      }
+    },
+
+    _onViewportResize() {
+      const wrap = document.getElementById('aiChatWrap');
+      if (!wrap) return;
+      const vv = window.visualViewport;
+      if (vv) {
+        wrap.style.height = vv.height - 60 + 'px';
+        const msgs = document.getElementById('aiMessages');
+        if (msgs) {
+          requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+        }
+      }
     },
 
     _initChips() {
@@ -6932,7 +7197,7 @@ const Pages = {
       Pages.ai._chips.forEach(chip => {
         const btn = document.createElement('button');
         btn.className = 'ai-chip';
-        btn.textContent = chip.label;
+        btn.innerHTML = '<span class="ai-chip-icon">' + chip.icon + '</span>' + chip.label;
         btn.addEventListener('click', () => Pages.ai.sendQuick(chip.text));
         container.appendChild(btn);
       });
@@ -6943,11 +7208,13 @@ const Pages = {
       if (!el) return;
 
       if (!Pages.ai._messages.length) {
-        // Welcome ekranini ko'rsatish
         const welcome = el.querySelector('.ai-welcome');
         if (welcome) welcome.style.display = '';
-        // Agar oldin xabarlar qo'shilgan bo'lsa ularni tozalash
-        el.querySelectorAll('.ai-msg, .ai-typing').forEach(m => m.remove());
+        el.querySelectorAll('.ai-msg, .ai-typing-wrap').forEach(m => m.remove());
+
+        // Clear tugmasini yashirish
+        const clearBtn = document.getElementById('aiClearBtn');
+        if (clearBtn) clearBtn.classList.remove('visible');
         return;
       }
 
@@ -6955,11 +7222,12 @@ const Pages = {
       const welcome = el.querySelector('.ai-welcome');
       if (welcome) welcome.style.display = 'none';
 
-      // Mavjud xabarlarni tozalash va qayta render
-      el.querySelectorAll('.ai-msg, .ai-typing').forEach(m => m.remove());
+      el.querySelectorAll('.ai-msg, .ai-typing-wrap').forEach(m => m.remove());
 
-      Pages.ai._messages.forEach(m => {
+      Pages.ai._messages.forEach((m, i) => {
         const isUser = m.role === 'user';
+        const wrapper = document.createElement('div');
+
         const div = document.createElement('div');
         div.className = 'ai-msg ai-msg--' + (isUser ? 'user' : 'ai');
 
@@ -6972,18 +7240,42 @@ const Pages = {
 
         const bubble = document.createElement('div');
         bubble.className = 'ai-msg-bubble';
-        // AI javobini formatlash (markdown-like)
         bubble.innerHTML = isUser ? UI.esc(m.content) : Pages.ai._formatAI(m.content);
         div.appendChild(bubble);
-        el.appendChild(div);
+        wrapper.appendChild(div);
+
+        // Vaqt ko'rsatkichi
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'ai-msg-time';
+        if (isUser) timeDiv.style.textAlign = 'right';
+        else timeDiv.style.paddingLeft = '36px';
+        timeDiv.textContent = m._time || Pages.ai._formatTime(m._date);
+        wrapper.appendChild(timeDiv);
+
+        el.appendChild(wrapper);
       });
 
       // Chart render
       Pages.ai._renderChart(el);
       el.scrollTop = el.scrollHeight;
+
+      // Clear tugmasini ko'rsatish — mavjud bo'lmasa yaratish
+      let clearBtn = document.getElementById('aiClearBtn');
+      if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.id = 'aiClearBtn';
+        clearBtn.className = 'ai-clear-btn';
+        clearBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+        clearBtn.addEventListener('click', () => {
+          TG.haptic('medium');
+          Pages.ai.clear();
+        });
+        el.parentNode.insertBefore(clearBtn, el);
+      }
+      clearBtn.classList.add('visible');
     },
 
-    // Oddiy markdown formatlash
+    // Yaxshilangan markdown formatlash
     _formatAI(text) {
       if (!text) return '';
       let s = UI.esc(text);
@@ -6992,9 +7284,12 @@ const Pages = {
       // *italic*
       s = s.replace(/\*(.+?)\*/g, '<i>$1</i>');
       // `code`
-      s = s.replace(/`(.+?)`/g, '<code style="background:var(--surface-2);padding:1px 4px;border-radius:3px;font-size:12px;">$1</code>');
+      s = s.replace(/`(.+?)`/g, '<code style="background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:12px;font-family:monospace;">$1</code>');
+      // — Raqamlarni formatlash (1 000 000 so'm ga o'xshash) — faqat katta sonlar
+      s = s.replace(/(\d{1,3}(?:\s\d{3})+)/g, '<b>$1</b>');
       // Yangi qatorlar
       s = s.replace(/\n/g, '<br>');
+      // ✅ ❌ ⚠️ kabi emojilardan keyin sal bo'sh joy
       return s;
     },
 
@@ -7050,32 +7345,48 @@ const Pages = {
       const text = input.value.trim();
       if (!text || Pages.ai._loading) return;
 
+      // Internet tekshirish
+      if (!navigator.onLine) {
+        UI.toast('Internet aloqasi yo\'q', 'error');
+        TG.hapticNotify('error');
+        return;
+      }
+
       // User xabarini qo'shish
-      Pages.ai._messages.push({ role: 'user', content: text });
+      const now = new Date();
+      Pages.ai._messages.push({ role: 'user', content: text, _time: Pages.ai._formatTime(now), _date: now });
       input.value = '';
       input.style.height = 'auto';
+
+      // Mobilda klaviaturani yopish
+      input.blur();
+
       Pages.ai.renderMessages();
       Pages.ai._showTyping();
 
       Pages.ai._loading = true;
-      sendBtn.disabled = true;
+      if (sendBtn) sendBtn.disabled = true;
       TG.haptic('light');
 
       try {
         const aiResponse = await Pages.ai._callAI();
-        Pages.ai._messages.push({ role: 'assistant', content: aiResponse });
+        const aiNow = new Date();
+        Pages.ai._messages.push({ role: 'assistant', content: aiResponse, _time: Pages.ai._formatTime(aiNow), _date: aiNow });
         TG.hapticNotify('success');
+        Sound.success();
       } catch (e) {
         console.error('AI error:', e);
         Pages.ai._messages.push({
           role: 'assistant',
-          content: 'Xatolik yuz berdi: ' + (e.message || 'Noma\'lum xato') + '\n\nIltimos qayta urinib ko\'ring.'
+          content: '⚠️ ' + (e.message || 'Noma\'lum xato') + '\n\nQayta urinib ko\'ring.',
+          _time: Pages.ai._formatTime(new Date()),
+          _date: new Date()
         });
         TG.hapticNotify('error');
         Sound.error();
       } finally {
         Pages.ai._loading = false;
-        sendBtn.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
         Pages.ai._hideTyping();
         Pages.ai.renderMessages();
       }
@@ -7084,95 +7395,268 @@ const Pages = {
     // Edge Function ga so'rov — Groq + DB tools
     async _callAI() {
       const url = CONFIG.SUPABASE_URL + '/functions/v1/ai-agent';
-      const history = Pages.ai._messages.slice(-10).map(m => ({
+      const history = Pages.ai._messages.filter(m => m.role === 'user' || m.role === 'assistant').slice(-10).map(m => ({
         role: m.role, content: m.content,
       }));
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          messages: history,
-          admin_tg_id: State.user?.id || CONFIG.DEV_TG_ID,
-        }),
-      });
+      // Timeout — 30 soniya (mobilda sekin internet uchun)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Server xatosi (' + response.status + ')');
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + CONFIG.SUPABASE_KEY,
+            'apikey': CONFIG.SUPABASE_KEY,
+          },
+          body: JSON.stringify({
+            messages: history,
+            admin_tg_id: State.user?.id || CONFIG.DEV_TG_ID,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          let errMsg = 'Server xatosi (' + response.status + ')';
+          try {
+            const errData = await response.json();
+            errMsg = errData.error || errMsg;
+          } catch(_) {}
+          throw new Error(errMsg);
+        }
+
+        const data = await response.json();
+        return data.reply || 'Javob olinmadi';
+      } catch (e) {
+        clearTimeout(timeoutId);
+        if (e.name === 'AbortError') {
+          throw new Error('So\'rov vaqti tugadi. Internet aloqangizni tekshiring.');
+        }
+        throw e;
       }
-
-      const data = await response.json();
-      return data.reply || 'Javob olinmadi';
     },
 
-    // Voice input — Speech Recognition
+    // Voice input — to'liq qayta yozilgan
     _recognition: null,
     _isRecording: false,
+    _voiceTimer: null,
+    _voiceSeconds: 0,
+    _voiceText: '',
+    _voiceInterim: '',
 
     toggleVoice() {
       if (Pages.ai._isRecording) {
-        Pages.ai.stopVoice();
+        // Recording to'xtatish — matnni saqlash
+        Pages.ai._finishRecording();
         return;
       }
+
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
         UI.toast('Brauzer ovozni qo\'llab-quvvatlamaydi', 'error');
         return;
       }
+
       const rec = new SR();
       rec.lang = 'uz-UZ';
-      rec.interimResults = false;
+      rec.interimResults = true;
       rec.maxAlternatives = 1;
-      rec.continuous = false;
+      rec.continuous = true;
 
       rec.onresult = (e) => {
-        const text = e.results[0][0].transcript;
-        const input = document.getElementById('aiInput');
-        if (input) {
-          input.value = (input.value ? input.value + ' ' : '') + text;
-          Pages.ai.autoResize(input);
+        let interim = '';
+        let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            final += t;
+          } else {
+            interim += t;
+          }
         }
-        Pages.ai.stopVoice();
-        TG.hapticNotify('success');
-        Sound.success();
+        if (final) {
+          Pages.ai._voiceText += (Pages.ai._voiceText ? ' ' : '') + final.trim();
+        }
+        Pages.ai._voiceInterim = interim;
+
+        // Preview yangilash
+        const preview = document.getElementById('aiVoicePreview');
+        if (preview) {
+          const full = Pages.ai._voiceText + (interim ? ' ' + interim : '');
+          preview.textContent = full || 'Gapiring...';
+          preview.style.color = full ? 'var(--text)' : 'var(--text-2)';
+        }
+
+        // Yuborish tugmasini faollashtirish
+        const sendBtn = document.getElementById('aiVoiceSendBtn');
+        if (sendBtn) {
+          sendBtn.disabled = !Pages.ai._voiceText && !interim;
+        }
       };
 
       rec.onerror = (e) => {
         console.warn('Voice error:', e.error);
         if (e.error === 'not-allowed') {
           UI.toast('Mikrofonga ruxsat bering', 'error');
+          Pages.ai.cancelVoice();
+        } else if (e.error === 'no-speech') {
+          // Ovoz eshitilmadi — davom etamiz
+          const status = document.getElementById('aiVoiceStatus');
+          if (status) status.textContent = 'Ovoz eshitilmadi...';
         } else if (e.error !== 'aborted') {
-          UI.toast('Ovoz tanilmadi, qayta urinib ko\'ring', 'error');
+          UI.toast('Xatolik: ' + e.error, 'error');
+          Pages.ai.cancelVoice();
         }
-        Pages.ai.stopVoice();
       };
 
       rec.onend = () => {
-        Pages.ai.stopVoice();
+        // Agar hali recording holat bo'lsa, qayta boshlash (continuous uchun)
+        if (Pages.ai._isRecording && Pages.ai._voiceSeconds < 60) {
+          try { rec.start(); } catch(_) {
+            Pages.ai._finishRecording();
+          }
+        }
       };
 
       try {
         rec.start();
         Pages.ai._recognition = rec;
         Pages.ai._isRecording = true;
+        Pages.ai._voiceText = '';
+        Pages.ai._voiceInterim = '';
+        Pages.ai._voiceSeconds = 0;
+
+        // UI yangilash
         document.getElementById('aiVoiceBtn')?.classList.add('recording');
+        const overlay = document.getElementById('aiVoiceOverlay');
+        overlay?.classList.remove('hidden');
+        const preview = document.getElementById('aiVoicePreview');
+        if (preview) { preview.textContent = 'Gapiring...'; preview.style.color = 'var(--text-2)'; }
+        const status = document.getElementById('aiVoiceStatus');
+        if (status) status.textContent = 'Tinglayapman...';
+        const timer = document.getElementById('aiVoiceTimer');
+        if (timer) timer.textContent = '0:00';
+        const sendBtn = document.getElementById('aiVoiceSendBtn');
+        if (sendBtn) sendBtn.disabled = true;
+
+        // Timer boshlash
+        Pages.ai._voiceTimer = setInterval(() => {
+          Pages.ai._voiceSeconds++;
+          const m = Math.floor(Pages.ai._voiceSeconds / 60);
+          const s = Pages.ai._voiceSeconds % 60;
+          const timerEl = document.getElementById('aiVoiceTimer');
+          if (timerEl) timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+
+          // Maksimum 60 soniya
+          if (Pages.ai._voiceSeconds >= 60) {
+            Pages.ai._finishRecording();
+          }
+        }, 1000);
+
         TG.haptic('medium');
       } catch(e) {
         UI.toast('Mikrofon ishga tushmadi', 'error');
       }
     },
 
-    stopVoice() {
+    _finishRecording() {
+      // Recognitionni to'xtatish
       if (Pages.ai._recognition) {
-        try { Pages.ai._recognition.stop(); } catch(e) {}
+        Pages.ai._isRecording = false; // qayta start bo'lmasligi uchun
+        try { Pages.ai._recognition.stop(); } catch(_) {}
         Pages.ai._recognition = null;
       }
-      Pages.ai._isRecording = false;
+
+      // Timer to'xtatish
+      if (Pages.ai._voiceTimer) {
+        clearInterval(Pages.ai._voiceTimer);
+        Pages.ai._voiceTimer = null;
+      }
+
+      // Button ni qaytarish
       document.getElementById('aiVoiceBtn')?.classList.remove('recording');
+
+      // Agar matn bor bo'lsa — yuborish tugmasini faollashtirish
+      const text = (Pages.ai._voiceText + ' ' + Pages.ai._voiceInterim).trim();
+      if (text) {
+        Pages.ai._voiceText = text;
+        Pages.ai._voiceInterim = '';
+        const preview = document.getElementById('aiVoicePreview');
+        if (preview) { preview.textContent = text; preview.style.color = 'var(--text)'; }
+        const sendBtn = document.getElementById('aiVoiceSendBtn');
+        if (sendBtn) sendBtn.disabled = false;
+        const status = document.getElementById('aiVoiceStatus');
+        if (status) { status.textContent = 'Tayyor'; status.style.color = 'var(--success)'; }
+        // Wave animatsiyasini to'xtatish
+        const wave = document.getElementById('aiVoiceWave');
+        if (wave) wave.querySelectorAll('span').forEach(s => { s.style.animation = 'none'; s.style.opacity = '0.3'; });
+      } else {
+        // Hech narsa yozilmadi — yopish
+        Pages.ai.cancelVoice();
+        UI.toast('Ovoz tanilmadi', 'error');
+      }
+    },
+
+    cancelVoice() {
+      // Hammasini tozalash
+      if (Pages.ai._recognition) {
+        Pages.ai._isRecording = false;
+        try { Pages.ai._recognition.stop(); } catch(_) {}
+        Pages.ai._recognition = null;
+      }
+      if (Pages.ai._voiceTimer) {
+        clearInterval(Pages.ai._voiceTimer);
+        Pages.ai._voiceTimer = null;
+      }
+      Pages.ai._voiceText = '';
+      Pages.ai._voiceInterim = '';
+      Pages.ai._voiceSeconds = 0;
+
+      document.getElementById('aiVoiceBtn')?.classList.remove('recording');
+      document.getElementById('aiVoiceOverlay')?.classList.add('hidden');
+
+      // Wave animatsiyasini qaytarish
+      const wave = document.getElementById('aiVoiceWave');
+      if (wave) wave.querySelectorAll('span').forEach(s => { s.style.animation = ''; s.style.opacity = ''; });
+      const status = document.getElementById('aiVoiceStatus');
+      if (status) { status.style.color = ''; }
+    },
+
+    sendVoice() {
+      const text = Pages.ai._voiceText.trim();
+      if (!text) return;
+
+      // Overlay yopish
+      document.getElementById('aiVoiceOverlay')?.classList.add('hidden');
+
+      // Wave animatsiyasini qaytarish
+      const wave = document.getElementById('aiVoiceWave');
+      if (wave) wave.querySelectorAll('span').forEach(s => { s.style.animation = ''; s.style.opacity = ''; });
+      const status = document.getElementById('aiVoiceStatus');
+      if (status) { status.style.color = ''; }
+
+      // Inputga yozib yuborish
+      const input = document.getElementById('aiInput');
+      if (input) {
+        input.value = text;
+        Pages.ai.autoResize(input);
+      }
+      Pages.ai._voiceText = '';
+      Pages.ai._voiceInterim = '';
+      Pages.ai._voiceSeconds = 0;
+
+      // Darhol yuborish
+      Pages.ai.send();
+      TG.hapticNotify('success');
+    },
+
+    stopVoice() {
+      // Legacy — cancelVoice ga yo'naltirish
+      Pages.ai.cancelVoice();
     },
 
     // Chart render — [CHART]...[/CHART] teglarni canvas ga aylantirish
@@ -7591,7 +8075,7 @@ function showApp(admin, user) {
   // Admin info "Yana" sahifasi pastida
   const info = document.getElementById('adminInfo');
   if (info) {
-    info.textContent = `${admin.full_name || user.first_name} · ID ${user.id} · v11.0`;
+    info.textContent = `${admin.full_name || user.first_name} · ID ${user.id} · v11.1`;
   }
 
   // ── Event listeners ──
