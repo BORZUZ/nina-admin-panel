@@ -20,6 +20,16 @@
 /* CSS Reset (minimal) */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; overscroll-behavior: none; }
+
+/* ── Performance: GPU acceleration & containment ── */
+.page { contain: content; }
+.sheet, .picker-sheet { will-change: transform; }
+.sheet-overlay { will-change: opacity; }
+.bottom-nav, .app-header { contain: layout style; }
+.log-card, .item-card, .rank-row { contain: layout style; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
 button, input, select, textarea { font: inherit; color: inherit; background: none; border: none; outline: none; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
@@ -128,8 +138,8 @@ body {
   animation: aiFadeIn 0.4s ease-out;
 }
 @keyframes aiFadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .ai-welcome-avatar {
   width: 52px; height: 52px;
@@ -188,8 +198,8 @@ body {
   animation: aiMsgIn 0.25s ease-out;
 }
 @keyframes aiMsgIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .ai-msg--user {
   flex-direction: row-reverse;
@@ -344,7 +354,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, transform 0.15s;
   border: none;
   background: transparent;
 }
@@ -357,8 +367,8 @@ body {
 .ai-voice-btn.recording .mic-icon { display: none; }
 .ai-voice-btn.recording .stop-icon { display: block; stroke: #fff; }
 @keyframes voicePulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(255,59,48,0.35); }
-  50% { box-shadow: 0 0 0 6px rgba(255,59,48,0); }
+  0%,100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
 /* Voice recording overlay */
@@ -630,8 +640,8 @@ body {
 }
 .page.active { display: block; }
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Empty state placeholder */
@@ -962,20 +972,23 @@ body {
 
 /* ── SKELETON LOADER ─────────────────── */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--surface-2) 0%,
-    var(--surface-3) 50%,
-    var(--surface-2) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  background: var(--surface-2);
   border-radius: 4px;
   color: transparent !important;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--surface-3) 50%, transparent 100%);
+  animation: shimmer 1.4s linear infinite;
+  will-change: transform;
 }
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1174,10 +1187,18 @@ body {
 .log-card.skeleton-card .log-card__icon svg { display: none; }
 .skeleton-line {
   height: 10px;
-  background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  background: var(--surface-2);
   border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--surface-3) 50%, transparent 100%);
+  animation: shimmer 1.4s linear infinite;
+  will-change: transform;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -2088,6 +2109,25 @@ body {
           </div>
         </div>
 
+        <!-- ✂️ BICHUV MINI-KARTA — faqat admin ko'radi -->
+        <div class="card" id="bichuvHomeCard" style="display:none; border-left: 3px solid #FF3B30; cursor:pointer;" data-goto="bichuv">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,59,48,0.10);display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+              </div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);">✂️ Bichuv bo'limi</div>
+                <div style="font-size:12px;color:var(--text-2);" id="bichuvHomeStat">Yuklanmoqda...</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div id="bichuvHomeBadge" style="display:none;background:rgba(255,59,48,0.12);color:#FF3B30;font-size:12px;font-weight:600;padding:4px 10px;border-radius:10px;"></div>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+
         <!-- 30 day sparkline -->
         <div class="card">
           <div class="card__head">
@@ -2302,7 +2342,7 @@ body {
 
         <!-- Admin info -->
         <div style="text-align: center; padding: 24px 0 8px; font-size: 11px; color: var(--text-2);">
-          <div id="adminInfo">Nina Admin · v11.0</div>
+          <div id="adminInfo">Nina Admin · v13.1</div>
         </div>
 
       </section>
@@ -2321,6 +2361,77 @@ body {
 
         <div id="paymentsList">
           <div class="empty-mini" data-i18n="loading">Yuklanmoqda...</div>
+        </div>
+      </section>
+
+      <!-- ✂️ BICHUV SAHIFASI -->
+      <section class="page" data-page="bichuv">
+        <div class="page-header" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,59,48,0.12);display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#FF3B30;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;">
+                <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>
+                <line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/>
+                <line x1="8.12" y1="8.12" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--text);">Bichuv bo'limi</div>
+              <div style="font-size:11px;color:var(--text-2);" id="bichuvTodayStat">Yuklanmoqda...</div>
+            </div>
+          </div>
+          <button class="btn btn--primary" style="flex:0 0 auto;padding:6px 14px;font-size:12px;background:#FF3B30;border-color:#FF3B30;" id="bichuvAddBtn">+ Kiritish</button>
+        </div>
+
+        <!-- Bugungi stat -->
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat-card">
+            <div class="stat-card__head">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="stat-card__label">Bugun (dona)</span>
+            </div>
+            <div class="stat-card__value" id="bichuvTodayQty">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__head">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              <span class="stat-card__label">Bugun (summa)</span>
+            </div>
+            <div class="stat-card__value" id="bichuvTodayAmt">—</div>
+          </div>
+        </div>
+
+        <!-- ✂️ Tab navigation: Yozuvlar / Mahsulotlar -->
+        <div class="filter-row" id="bichuvTabs" style="margin-bottom:10px;">
+          <div class="chip active" data-btab="logs">📋 Yozuvlar</div>
+          <div class="chip" data-btab="products">📦 Mahsulotlar</div>
+        </div>
+
+        <!-- TAB 1: Yozuvlar (bichuv entries) -->
+        <div id="bichuvTabLogs">
+          <!-- Filter chips -->
+          <div class="filter-row" id="bichuvFilter" style="margin-bottom:10px;">
+            <div class="chip active" data-bfilter="today">Bugun</div>
+            <div class="chip" data-bfilter="week">Hafta</div>
+            <div class="chip" data-bfilter="month">Oy</div>
+            <div class="chip" data-bfilter="all">Hammasi</div>
+          </div>
+
+          <!-- Logs list -->
+          <div id="bichuvList">
+            <div class="empty-mini">Yuklanmoqda...</div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Bichuv mahsulotlari -->
+        <div id="bichuvTabProducts" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-size:13px;color:var(--text-2);" id="bProdCount">—</div>
+            <button class="btn btn--primary" style="padding:6px 14px;font-size:12px;background:#FF3B30;border-color:#FF3B30;" id="bProdAddBtn">+ Mahsulot</button>
+          </div>
+          <div id="bProdList">
+            <div class="empty-mini">Yuklanmoqda...</div>
+          </div>
         </div>
       </section>
 
@@ -2398,22 +2509,33 @@ body {
           <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;">
             <button class="chip active" data-proddate="today">Bugun</button>
             <button class="chip" data-proddate="yesterday">Kecha</button>
+            <button class="chip" data-proddate="week">Hafta</button>
           </div>
           <button class="icon-btn" id="prodRefreshBtn" aria-label="Yangilash">
             <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
           </button>
         </div>
 
-        <div id="prodProductFilter" style="margin-bottom:14px;">
-          <div class="search-box">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="search" id="prodSearch" placeholder="Mahsulot nomi yoki kodi..." autocomplete="off">
-          </div>
+        <!-- Umumiy statistika -->
+        <div id="prodSummaryRow" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+          <div class="stat-card"><div class="stat-card__head"><span class="stat-card__label">Bichildi</span></div><div class="stat-card__value" id="prodStatBichuv">—</div></div>
+          <div class="stat-card"><div class="stat-card__head"><span class="stat-card__label">Jarayonda</span></div><div class="stat-card__value" id="prodStatProcess">—</div></div>
+          <div class="stat-card"><div class="stat-card__head"><span class="stat-card__label">Tayyor</span></div><div class="stat-card__value" id="prodStatDone">—</div></div>
         </div>
 
-        <div id="prodSummaryRow" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;"></div>
+        <!-- Conveyer holati — mahsulot bo'yicha -->
+        <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:14px;font-weight:500;color:var(--text);">Conveyer holati</div>
+          <div style="font-size:11px;color:var(--text-2);" id="prodLastUpdate">—</div>
+        </div>
 
         <div id="prodContent">
+          <div class="empty-mini">Yuklanmoqda...</div>
+        </div>
+
+        <!-- Bo'lim tafsiloti -->
+        <div style="margin-top:14px;margin-bottom:6px;font-size:14px;font-weight:500;color:var(--text);">Bo'limlar bo'yicha</div>
+        <div id="prodDeptDetail">
           <div class="empty-mini">Yuklanmoqda...</div>
         </div>
       </section>
@@ -2521,7 +2643,7 @@ body {
             </div>
             <div class="list-item__body">
               <div class="list-item__title" data-i18n="set_version">Versiya</div>
-              <div class="list-item__subtitle">v11.0</div>
+              <div class="list-item__subtitle">v14.0</div>
             </div>
           </div>
           <div class="list-item" style="cursor: default;">
@@ -2537,7 +2659,7 @@ body {
 
         <div style="text-align: center; padding: 24px 16px; font-size: 11px; color: var(--text-2); line-height: 1.6;">
           Nina Admin Panel<br>
-          Telegram Mini App · v11.0
+          Telegram Mini App · v14.0
         </div>
       </section>
 
@@ -2613,8 +2735,8 @@ const CONFIG = {
   SUPABASE_URL:  'https://fcxjdxbqddqpggejepmu.supabase.co',
   SUPABASE_KEY:  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjeGpkeGJxZGRxcGdnZWplcG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1MjA2MTMsImV4cCI6MjA4NzA5NjYxM30.tobDWwAR_-KaLBMKbk0aPscvRHVMrajFiYbC-MMB_xY',
   // Dev mode — agar Telegram tashqarisida ochilsa, shu Telegram ID bilan login qilamiz
-  DEV_MODE:      true,
-  DEV_TG_ID:     6595579022, // Super Admin
+  DEV_MODE:      false,
+  DEV_TG_ID:     null,
 };
 
 // ─────────────────────────────────────────
@@ -2725,21 +2847,30 @@ const TG = {
   },
 
   // BackButton
+  _currentBackHandler: null,
   showBack(handler) {
     const btn = State.tg?.BackButton;
     if (!btn) return;
+    if (this._currentBackHandler) btn.offClick(this._currentBackHandler);
+    this._currentBackHandler = handler;
     btn.onClick(handler);
     btn.show();
   },
 
   hideBack() {
-    State.tg?.BackButton?.hide();
+    const btn = State.tg?.BackButton;
+    if (btn && this._currentBackHandler) btn.offClick(this._currentBackHandler);
+    this._currentBackHandler = null;
+    btn?.hide();
   },
 
   // MainButton
+  _currentMainHandler: null,
   showMain(text, handler, color) {
     const btn = State.tg?.MainButton;
     if (!btn) return;
+    if (this._currentMainHandler) btn.offClick(this._currentMainHandler);
+    this._currentMainHandler = handler;
     btn.setText(text);
     if (color) btn.color = color;
     btn.onClick(handler);
@@ -2747,7 +2878,10 @@ const TG = {
   },
 
   hideMain() {
-    State.tg?.MainButton?.hide();
+    const btn = State.tg?.MainButton;
+    if (btn && this._currentMainHandler) btn.offClick(this._currentMainHandler);
+    this._currentMainHandler = null;
+    btn?.hide();
   },
 
   // Get Telegram user
@@ -3212,10 +3346,16 @@ const I18N = {
     }
     // Bo'lim/Mahsulot soni — refreshlar bilan
     Pages.more.loadCounts();
+    Pages.more.loadBichuvBadge();
     // Joriy sahifani qayta render qilish (dinamik kontent uchun)
-    const page = Router.current;
-    if (typeof Pages[page]?.onEnter === 'function') {
-      try { Pages[page].onEnter(); } catch(e) {}
+    // Faqat kerak bo'lganda — cirkulyar chaqiruvni oldini olish
+    if (!I18N._applying) {
+      I18N._applying = true;
+      const page = Router.current;
+      if (typeof Pages[page]?.onEnter === 'function') {
+        try { Pages[page].onEnter(); } catch(e) {}
+      }
+      I18N._applying = false;
     }
   },
 };
@@ -3615,6 +3755,7 @@ const Router = {
     logs:        { title: 'Yozuvlar',     subtitle: '', isRoot: true,  nav: 'logs' },
     workers:     { title: 'Ishchilar',    subtitle: '', isRoot: true,  nav: 'workers' },
     more:        { title: 'Yana',         subtitle: '', isRoot: true,  nav: 'more' },
+    bichuv:      { title: '✂️ Bichuv',    subtitle: 'Maxfiy bo\'lim', isRoot: false, nav: 'home' },
     payments:    { title: 'Maosh',        subtitle: '', isRoot: false, nav: 'more' },
     departments: { title: "Bo'limlar",    subtitle: '', isRoot: false, nav: 'more' },
     products:    { title: 'Mahsulotlar',  subtitle: '', isRoot: false, nav: 'more' },
@@ -3757,7 +3898,7 @@ const Pages = {
 
         // Parallel: barcha kerakli ma'lumotlarni olamiz
         const [logsRes, paymentsRes, adjRes] = await Promise.all([
-          sb.from('work_logs').select('worker_id, total_amount').in('worker_id', workerIds),
+          sb.from('work_logs').select('worker_id, total_amount').or('is_private.is.null,is_private.eq.false').in('worker_id', workerIds),
           sb.from('payments').select('worker_id, amount').in('worker_id', workerIds),
           sb.from('payment_adjustments').select('worker_id, amount, type').in('worker_id', workerIds),
         ]);
@@ -3846,12 +3987,16 @@ const Pages = {
         `;
       }).join('');
 
-      list.querySelectorAll('.item-card[data-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const w = Pages.payments.workers.find(x => x.id === Number(el.dataset.id));
+      // Event delegation — bitta listener
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.item-card[data-id]');
+          if (!card) return;
+          const w = Pages.payments.workers.find(x => x.id === Number(card.dataset.id));
           if (w) Pages.payments.openActions(w);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     openActions(w) {
@@ -4171,9 +4316,10 @@ const Pages = {
         // Parallel queries
         const sb = State.supabase;
         const [todayRes, yestRes, monthRes, workersRes, lastRes] = await Promise.all([
-          // Bugungi yozuvlar
+          // Bugungi yozuvlar (bichuv yozuvlarini chiqarib tashla)
           sb.from('work_logs')
             .select('id, quantity, total_amount, worker_id, product_id, created_at, workers(full_name), products(name)')
+            .or('is_private.is.null,is_private.eq.false')
             .gte('created_at', today.toISOString())
             .lt('created_at', tomorrow.toISOString())
             .order('created_at', { ascending: false }),
@@ -4181,21 +4327,24 @@ const Pages = {
           // Kechagi (taqqoslash uchun)
           sb.from('work_logs')
             .select('total_amount')
+            .or('is_private.is.null,is_private.eq.false')
             .gte('created_at', yesterday.toISOString())
             .lt('created_at', today.toISOString()),
 
           // 30 kunlik (sparkline + total uchun)
           sb.from('work_logs')
             .select('total_amount, created_at')
+            .or('is_private.is.null,is_private.eq.false')
             .gte('created_at', days30.toISOString())
             .order('created_at', { ascending: true }),
 
           // Faol ishchilar
           sb.from('workers').select('id, is_active, approval_status'),
 
-          // Oxirgi yozuv
+          // Oxirgi yozuv (bichuv yozuvlarini chiqarib tashla)
           sb.from('work_logs')
             .select('id, quantity, total_amount, created_at, added_by, workers(full_name), products(name)')
+            .or('is_private.is.null,is_private.eq.false')
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle(),
@@ -4591,6 +4740,7 @@ const Pages = {
 
         let query = sb.from('work_logs')
           .select('id, worker_id, product_id, quantity, total_amount, note, created_at, is_edited, original_qty, original_amount, edited_at, actual_department_id, actual_department_name, added_by, seen_by_admin, workers(full_name, department_id), products(id, name, code, price, department_id)')
+          .or('is_private.is.null,is_private.eq.false')
           .order('created_at', { ascending: false })
           .limit(200);
 
@@ -4685,14 +4835,17 @@ const Pages = {
 
       list.innerHTML = html;
 
-      // Attach click handlers
-      list.querySelectorAll('.log-card[data-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const id = Number(el.dataset.id);
+      // Event delegation — bitta listener (har elementga alohida emas)
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.log-card[data-id]');
+          if (!card) return;
+          const id = Number(card.dataset.id);
           const log = Pages.logs.cache.find(l => l.id === id);
           if (log) Pages.logs.openEdit(log);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     renderItem(l) {
@@ -4763,7 +4916,7 @@ const Pages = {
           const sb = State.supabase;
           const [wRes, pRes, dRes] = await Promise.all([
             sb.from('workers').select('id, full_name, department_id').eq('is_active', true).order('full_name'),
-            sb.from('products').select('id, name, code, price, department_id, is_active').eq('is_active', true).order('name'),
+            sb.from('products').select('id, name, code, price, department_id, is_active').eq('is_active', true).or('is_bichuv_product.is.null,is_bichuv_product.eq.false').order('name'),
             sb.from('departments').select('id, name').eq('is_active', true).order('name'),
           ]);
           Pages.logs.workersCache = wRes.data || [];
@@ -5005,7 +5158,7 @@ const Pages = {
           const sb = State.supabase;
           const [wRes, pRes, dRes] = await Promise.all([
             sb.from('workers').select('id, full_name, department_id').eq('is_active', true).order('full_name'),
-            sb.from('products').select('id, name, code, price, department_id, is_active').eq('is_active', true).order('name'),
+            sb.from('products').select('id, name, code, price, department_id, is_active').eq('is_active', true).or('is_bichuv_product.is.null,is_bichuv_product.eq.false').order('name'),
             sb.from('departments').select('id, name').eq('is_active', true).order('name'),
           ]);
           Pages.logs.workersCache = wRes.data || [];
@@ -5201,6 +5354,11 @@ const Pages = {
           insertData.actual_department_name = d?.name || null;
         }
 
+        // ── Stage avtomatik aniqlash (bo'lim asosida) ──
+        const stageDeptId = finalDeptId || workerDeptId;
+        const DEPT_STAGE_MAP = { 1: 'averlok', 2: 'raspach', 3: 'upakofka', 9: 'press', 10: 'obshiy_press', 11: 'bichuv' };
+        insertData.stage = DEPT_STAGE_MAP[stageDeptId] || 'averlok';
+
         const { error } = await State.supabase
           .from('work_logs')
           .insert(insertData);
@@ -5337,13 +5495,17 @@ const Pages = {
         }
       });
 
-      list.querySelectorAll('.item-card[data-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const id = Number(el.dataset.id);
+      // Event delegation — bitta listener
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.item-card[data-id]');
+          if (!card) return;
+          const id = Number(card.dataset.id);
           const w = Pages.workers.cache.find(x => x.id === id);
           if (w) Pages.workers.openEdit(w);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     renderCard(w) {
@@ -5639,12 +5801,14 @@ const Pages = {
     onEnter() {
       // Bo'limlar va mahsulotlar sonini ko'rsatish
       Pages.more.loadCounts();
+      // Bichuv bugungi badge
+      Pages.more.loadBichuvBadge();
     },
     async loadCounts() {
       try {
         const [{ count: dCount }, { count: pCount }] = await Promise.all([
           State.supabase.from('departments').select('*', { count: 'exact', head: true }),
-          State.supabase.from('products').select('*', { count: 'exact', head: true }),
+          State.supabase.from('products').select('*', { count: 'exact', head: true }).or('is_bichuv_product.is.null,is_bichuv_product.eq.false'),
         ]);
         const d = document.getElementById('dept-count');
         const p = document.getElementById('prod-count');
@@ -5652,7 +5816,45 @@ const Pages = {
         if (d) d.textContent = `${dCount || 0} ${total}`;
         if (p) p.textContent = `${pCount || 0} ${total}`;
       } catch(e) { /* sokin xato */ }
-    }
+    },
+    async loadBichuvBadge() {
+      try {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const tomorrow = new Date(today.getTime() + 86400000);
+        const { data } = await State.supabase.from('work_logs')
+          .select('quantity, total_amount')
+          .eq('is_private', true)
+          .gte('created_at', today.toISOString())
+          .lt('created_at', tomorrow.toISOString());
+        const qty = (data || []).reduce((s, l) => s + Number(l.quantity || 0), 0);
+        const amt = (data || []).reduce((s, l) => s + Number(l.total_amount || 0), 0);
+
+        // Yana menyusidagi badge (endi yo'q, lekin ehtiyot uchun)
+        const badge = document.getElementById('bichuv-today-badge');
+        if (badge) {
+          if (qty > 0) { badge.textContent = `${qty} dona`; badge.style.display = 'block'; }
+          else badge.style.display = 'none';
+        }
+
+        // ── Bosh sahifadagi bichuv kartasi ──
+        const homeCard = document.getElementById('bichuvHomeCard');
+        const homeStat = document.getElementById('bichuvHomeStat');
+        const homeBadge = document.getElementById('bichuvHomeBadge');
+        if (homeCard && State.admin) {
+          homeCard.style.display = 'block';
+          if (homeStat) {
+            homeStat.textContent = qty > 0
+              ? `Bugun: ${qty} dona · ${UI.num(amt)} so'm`
+              : 'Bugun hali kiritilmagan';
+          }
+          if (homeBadge) {
+            if (qty > 0) { homeBadge.textContent = `${qty} dona`; homeBadge.style.display = 'block'; }
+            else homeBadge.style.display = 'none';
+          }
+        }
+      } catch(e) {}
+    },
   },
   departments: {
     cache: [],
@@ -5701,12 +5903,15 @@ const Pages = {
         </div>
       `).join('');
 
-      list.querySelectorAll('.item-card[data-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const d = Pages.departments.cache.find(x => x.id === Number(el.dataset.id));
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.item-card[data-id]');
+          if (!card) return;
+          const d = Pages.departments.cache.find(x => x.id === Number(card.dataset.id));
           if (d) Pages.departments.openEdit(d);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     openAdd() { Pages.departments.openForm(null); },
@@ -5824,7 +6029,7 @@ const Pages = {
       try {
         const sb = State.supabase;
         const [pRes, dRes] = await Promise.all([
-          sb.from('products').select('*').order('name'),
+          sb.from('products').select('*').or('is_bichuv_product.is.null,is_bichuv_product.eq.false').order('name'),
           sb.from('departments').select('*').eq('is_active', true).order('name'),
         ]);
         Pages.products.cache = pRes.data || [];
@@ -5904,12 +6109,15 @@ const Pages = {
         `;
       }).join('');
 
-      list.querySelectorAll('.item-card[data-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const p = Pages.products.cache.find(x => x.id === Number(el.dataset.id));
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.item-card[data-id]');
+          if (!card) return;
+          const p = Pages.products.cache.find(x => x.id === Number(card.dataset.id));
           if (p) Pages.products.openEdit(p);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     openAdd() { Pages.products.openForm(null); },
@@ -6105,6 +6313,7 @@ const Pages = {
       const { data: logs } = await State.supabase
         .from('work_logs')
         .select('quantity, total_amount, worker_id, product_id, workers(full_name), products(name)')
+        .or('is_private.is.null,is_private.eq.false')
         .gte('created_at', today.toISOString())
         .lt('created_at', tomorrow.toISOString())
         .order('created_at', { ascending: false });
@@ -6171,6 +6380,7 @@ const Pages = {
       const { data: logs } = await State.supabase
         .from('work_logs')
         .select('total_amount, quantity, worker_id, workers(full_name)')
+        .or('is_private.is.null,is_private.eq.false')
         .gte('created_at', start.toISOString())
         .lt('created_at', end.toISOString());
 
@@ -6255,6 +6465,7 @@ const Pages = {
       const [logsRes, dRes] = await Promise.all([
         sb.from('work_logs')
           .select('total_amount, quantity, worker_id, actual_department_id, workers(department_id)')
+          .or('is_private.is.null,is_private.eq.false')
           .gte('created_at', start.toISOString())
           .lt('created_at', end.toISOString()),
         sb.from('departments').select('id, name').order('name'),
@@ -6334,6 +6545,7 @@ const Pages = {
       const { data: logs } = await State.supabase
         .from('work_logs')
         .select('quantity, total_amount, worker_id, workers(full_name)')
+        .or('is_private.is.null,is_private.eq.false')
         .gte('created_at', from.toISOString())
         .lt('created_at', to.toISOString());
 
@@ -6563,6 +6775,7 @@ const Pages = {
         const [logsRes, paymentsRes, adjRes] = await Promise.all([
           sb.from('work_logs').select('quantity, total_amount, created_at, products(name)')
             .eq('worker_id', workerId)
+            .or('is_private.is.null,is_private.eq.false')
             .gte('created_at', from.toISOString())
             .lte('created_at', to.toISOString())
             .order('created_at', { ascending: false }),
@@ -6644,11 +6857,11 @@ const Pages = {
 
   production: {
     _date: 'today',
-    _search: '',
-    _searchTimer: null,
     _initialized: false,
     _allLogs: [],
-
+    DEPT_STAGE: { 1: 'averlok', 2: 'raspach', 3: 'upakofka', 9: 'press', 10: 'obshiy_press', 11: 'bichuv' },
+    STAGE_ORDER: ['bichuv', 'averlok', 'raspach', 'press'],
+    STAGE_LABELS: { bichuv: 'Bichuv', averlok: 'Averlok', raspach: 'Raspach', press: 'Press' },
     onEnter() {
       if (!Pages.production._initialized) {
         Pages.production.setupListeners();
@@ -6656,198 +6869,168 @@ const Pages = {
       }
       Pages.production.load();
     },
-
     setupListeners() {
-      document.querySelectorAll('[data-proddate]').forEach(btn => {
+      document.querySelectorAll('#prodDateRow .chip').forEach(btn => {
         btn.addEventListener('click', () => {
-          document.querySelectorAll('[data-proddate]').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('#prodDateRow .chip').forEach(c => c.classList.remove('active'));
           btn.classList.add('active');
           Pages.production._date = btn.dataset.proddate;
           TG.haptic('light');
           Pages.production.load();
         });
       });
-
-      document.getElementById('prodRefreshBtn').addEventListener('click', () => {
+      document.getElementById('prodRefreshBtn')?.addEventListener('click', () => {
         TG.haptic('medium');
         Pages.production.load();
       });
-
-      const searchEl = document.getElementById('prodSearch');
-      searchEl.addEventListener('input', (e) => {
-        clearTimeout(Pages.production._searchTimer);
-        Pages.production._searchTimer = setTimeout(() => {
-          Pages.production._search = e.target.value.trim().toLowerCase();
-          Pages.production.render();
-        }, 200);
-      });
     },
-
     getDateRange() {
       const now = new Date();
-      if (Pages.production._date === 'yesterday') {
-        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-        const from = new Date(d);
-        const to = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        return { from, to, label: 'Kecha' };
-      }
-      const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const to = new Date(from.getTime() + 86400000);
-      return { from, to, label: 'Bugun' };
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today.getTime() + 86400000);
+      if (Pages.production._date === 'yesterday') return { from: new Date(today.getTime() - 86400000), to: today };
+      if (Pages.production._date === 'week') return { from: new Date(today.getTime() - 6 * 86400000), to: tomorrow };
+      return { from: today, to: tomorrow };
     },
-
     async load() {
-      const container = document.getElementById('prodContent');
-      const summaryRow = document.getElementById('prodSummaryRow');
-      container.innerHTML = '<div class="empty-mini">Yuklanmoqda...</div>';
-      summaryRow.innerHTML = '';
-
+      const content = document.getElementById('prodContent');
+      const deptDetail = document.getElementById('prodDeptDetail');
+      if (content) content.innerHTML = '<div class="empty-mini">Yuklanmoqda...</div>';
+      if (deptDetail) deptDetail.innerHTML = '<div class="empty-mini">Yuklanmoqda...</div>';
       try {
         const { from, to } = Pages.production.getDateRange();
         const sb = State.supabase;
-
-        const { data, error } = await sb
-          .from('work_logs')
-          .select('id, quantity, total_amount, added_by, created_at, worker_id, product_id, actual_department_name, workers(full_name, department_id, departments(name)), products(id, name, code, price, department_id, departments(name))')
+        const { data, error } = await sb.from('work_logs')
+          .select('id, quantity, total_amount, stage, product_id, worker_id, created_at, added_by, is_private, products(id, name, code, price), workers(full_name, department_id)')
           .gte('created_at', from.toISOString())
           .lt('created_at', to.toISOString())
           .order('created_at', { ascending: false });
-
         if (error) throw error;
-
         Pages.production._allLogs = data || [];
+        // Eski yozuvlarga stage berish
+        Pages.production._allLogs.forEach(l => {
+          if (!l.stage) {
+            if (l.is_private) { l.stage = 'bichuv'; }
+            else {
+              const deptId = l.workers?.department_id;
+              l.stage = Pages.production.DEPT_STAGE[deptId] || 'averlok';
+            }
+          }
+        });
         Pages.production.render();
-
       } catch(e) {
         console.error('Production load error:', e);
-        container.innerHTML = "<div class='empty-mini'>Xatolik. Qayta urinib ko'ring.</div>";
+        if (content) content.innerHTML = '<div class="empty-mini">Xatolik</div>';
       }
     },
-
     render() {
-      const container = document.getElementById('prodContent');
-      const summaryRow = document.getElementById('prodSummaryRow');
       const logs = Pages.production._allLogs;
-      const q = Pages.production._search;
-
-      // Mahsulot bo'yicha guruh
-      const productMap = new Map();
-      for (const log of logs) {
-        const prod = log.products;
-        if (!prod) continue;
-        const pid = prod.id;
-        const name = prod.name || '—';
-        const code = prod.code || '';
-
-        // Qidiruv filtri
-        if (q && !name.toLowerCase().includes(q) && !code.toLowerCase().includes(q)) continue;
-
-        if (!productMap.has(pid)) {
-          productMap.set(pid, {
-            id: pid, name, code,
-            deptName: prod.departments?.name || '—',
-            totalQty: 0, totalAmount: 0,
-            departments: new Map(),
-          });
-        }
-
-        const pm = productMap.get(pid);
-        pm.totalQty += Number(log.quantity || 0);
-        pm.totalAmount += Number(log.total_amount || 0);
-
-        // Bo'lim aniqlaш
-        const deptName = log.actual_department_name
-          || log.workers?.departments?.name
-          || '—';
-
-        if (!pm.departments.has(deptName)) {
-          pm.departments.set(deptName, { qty: 0, amount: 0, workers: new Map() });
-        }
-        const dm = pm.departments.get(deptName);
-        dm.qty += Number(log.quantity || 0);
-        dm.amount += Number(log.total_amount || 0);
-
-        const wName = log.workers?.full_name || '—';
-        if (!dm.workers.has(wName)) dm.workers.set(wName, 0);
-        dm.workers.set(wName, dm.workers.get(wName) + Number(log.quantity || 0));
+      const content = document.getElementById('prodContent');
+      const deptDetail = document.getElementById('prodDeptDetail');
+      const bichuvLogs = logs.filter(l => l.stage === 'bichuv');
+      const workerLogs = logs.filter(l => l.stage !== 'bichuv');
+      const lastStage = workerLogs.filter(l => l.stage === 'press');
+      const totalBichuv = bichuvLogs.reduce((s, l) => s + Number(l.quantity || 0), 0);
+      const totalWorker = workerLogs.reduce((s, l) => s + Number(l.quantity || 0), 0);
+      const totalDone = lastStage.reduce((s, l) => s + Number(l.quantity || 0), 0);
+      document.getElementById('prodStatBichuv').textContent = totalBichuv;
+      document.getElementById('prodStatProcess').textContent = totalBichuv > 0 ? Math.max(0, totalBichuv - totalDone) : 0;
+      document.getElementById('prodStatDone').textContent = totalDone;
+      const updateEl = document.getElementById('prodLastUpdate');
+      if (updateEl) {
+        const n = new Date();
+        updateEl.textContent = ((n.getHours()<10?'0':'')+n.getHours())+':'+((n.getMinutes()<10?'0':'')+n.getMinutes())+' yangilandi';
       }
-
-      // Summary
-      const totalProducts = productMap.size;
-      const totalQty = [...productMap.values()].reduce((s, p) => s + p.totalQty, 0);
-      const totalAmount = [...productMap.values()].reduce((s, p) => s + p.totalAmount, 0);
-
-      summaryRow.innerHTML = `
-        <div class="stat-card">
-          <div class="stat-card__head"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><span class="stat-card__label">Mahsulot turi</span></div>
-          <div class="stat-card__value">${totalProducts}</div>
-          <div class="stat-card__hint">${totalQty} dona jami</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__head"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span class="stat-card__label">Jami summa</span></div>
-          <div class="stat-card__value">${UI.num(totalAmount)}</div>
-          <div class="stat-card__hint">so'm</div>
-        </div>
-      `;
-
-      if (productMap.size === 0) {
-        container.innerHTML = q
-          ? '<div class="empty-mini">Topilmadi</div>'
-          : '<div class="page-stub"><div class="page-stub__icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div class="page-stub__title">Yozuv yo&#39;q</div><div class="page-stub__text">Bu kunda hali ish kiritilmagan</div></div>';
+      // Mahsulot bo'yicha guruhlash
+      const productMap = new Map();
+      logs.forEach(l => {
+        const code = l.products?.code || 'N/A';
+        const name = l.products?.name || '—';
+        const key = code;
+        if (!productMap.has(key)) productMap.set(key, { code, name, stages: {} });
+        const p = productMap.get(key);
+        if (!p.stages[l.stage]) p.stages[l.stage] = { qty: 0, workers: new Map() };
+        p.stages[l.stage].qty += Number(l.quantity || 0);
+        const wName = l.workers?.full_name || (l.is_private ? 'Admin' : '—');
+        p.stages[l.stage].workers.set(wName, (p.stages[l.stage].workers.get(wName) || 0) + Number(l.quantity || 0));
+      });
+      if (!productMap.size) {
+        if (content) content.innerHTML = '<div class="page-stub"><div class="page-stub__icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div class="page-stub__title">Yozuv yo\'q</div><div class="page-stub__text">Bu sanada ma\'lumot topilmadi</div></div>';
+        if (deptDetail) deptDetail.innerHTML = '';
         return;
       }
-
-      // Saralash: ko'p ish qilingan mahsulot birinchi
-      const sorted = [...productMap.values()].sort((a, b) => b.totalQty - a.totalQty);
-
-      container.innerHTML = sorted.map(prod => {
-        const depts = [...prod.departments.entries()].sort((a, b) => b[1].qty - a[1].qty);
-
-        const deptsHtml = depts.map(([dName, dm]) => {
-          const workersList = [...dm.workers.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .map(([wn, wq]) => `<span style="color:var(--text-2);font-size:11px;">${UI.esc(wn)}: ${wq} dona</span>`)
-            .join('<span style="color:var(--text-3);margin:0 4px;">·</span>');
-
-          return `
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-top:0.5px solid var(--surface-3);">
-              <div style="min-width:0;flex:1;">
-                <div style="font-size:12px;font-weight:500;color:var(--text);">${UI.esc(dName)}</div>
-                <div style="margin-top:2px;display:flex;flex-wrap:wrap;gap:2px;">${workersList}</div>
-              </div>
-              <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-                <div style="font-size:14px;font-weight:600;color:var(--text);">${dm.qty} dona</div>
-                <div style="font-size:11px;color:var(--text-2);">${UI.num(dm.amount)} so'm</div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        const codeHtml = prod.code ? `<span style="background:var(--surface-2);color:var(--text-2);font-size:10px;padding:1px 6px;border-radius:4px;font-family:monospace;margin-left:6px;">${UI.esc(prod.code)}</span>` : '';
-
-        return `
-          <div class="card" style="margin-bottom:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
-                  ${UI.esc(prod.name)}${codeHtml}
-                </div>
-                <div style="font-size:11px;color:var(--text-2);margin-top:2px;">${UI.esc(prod.deptName)}</div>
-              </div>
-              <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-                <div style="font-size:18px;font-weight:600;color:var(--accent);">${prod.totalQty}</div>
-                <div style="font-size:10px;color:var(--text-2);">dona jami</div>
-              </div>
-            </div>
-            <div style="background:var(--surface-2);border-radius:8px;padding:2px 10px;margin-bottom:4px;">
-              ${deptsHtml}
-            </div>
-            <div style="text-align:right;font-size:12px;color:var(--text-2);padding-top:4px;">
-              Jami: <strong style="color:var(--text);">${UI.num(prod.totalAmount)} so'm</strong>
-            </div>
-          </div>
-        `;
-      }).join('');
+      const STAGES = Pages.production.STAGE_ORDER;
+      const LABELS = Pages.production.STAGE_LABELS;
+      const SC = { bichuv:'#FF3B30', averlok:'#534AB7', raspach:'#1D9E75', press:'#BA7517', obshiy_press:'#D85A30', upakofka:'#378ADD' };
+      let html = '<div class="card" style="padding:0;overflow-x:auto;">';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:480px;">';
+      html += '<thead><tr style="border-bottom:1px solid var(--surface-3);">';
+      html += '<th style="padding:10px 10px;text-align:left;font-weight:500;font-size:11px;color:var(--text-2);position:sticky;left:0;background:var(--bg);z-index:1;">Mahsulot</th>';
+      STAGES.forEach(s => {
+        html += '<th style="padding:8px 4px;text-align:center;font-weight:500;font-size:10px;color:'+SC[s]+';white-space:nowrap;">'+LABELS[s]+'</th>';
+      });
+      html += '<th style="padding:8px 6px;text-align:center;font-weight:600;font-size:11px;color:var(--text-2);">Qoldi</th></tr></thead><tbody>';
+      const sorted = [...productMap.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+      sorted.forEach(([key, prod]) => {
+        const bQty = prod.stages.bichuv?.qty || 0;
+        // Qoldi = Bichildi - Averlokga o'tgani (birinchi ishchi bosqich)
+        const averlokQty = prod.stages.averlok?.qty || 0;
+        const qoldi = Math.max(0, bQty - averlokQty);
+        html += '<tr style="border-bottom:0.5px solid var(--surface-3);">';
+        html += '<td style="padding:8px 10px;position:sticky;left:0;background:var(--bg);z-index:1;"><div style="font-weight:500;font-size:12px;color:var(--text);">'+UI.esc(prod.name)+'</div><div style="font-size:10px;color:var(--text-2);font-family:monospace;">'+UI.esc(prod.code)+'</div></td>';
+        STAGES.forEach((s, idx) => {
+          const qty = prod.stages[s]?.qty || 0;
+          const nextStage = STAGES[idx + 1];
+          const nextQty = nextStage ? (prod.stages[nextStage]?.qty || 0) : 0;
+          const stayingHere = s !== 'bichuv' ? Math.max(0, qty - nextQty) : 0;
+          html += '<td style="padding:6px 3px;text-align:center;">';
+          if (qty > 0) {
+            html += '<div style="font-weight:600;font-size:13px;color:'+SC[s]+';">'+qty+'</div>';
+            if (s !== 'bichuv' && idx < STAGES.length - 1 && stayingHere > 0) {
+              html += '<div style="font-size:9px;color:var(--text-2);">'+stayingHere+' turgan</div>';
+            }
+          } else { html += '<div style="color:var(--text-2);font-size:11px;">—</div>'; }
+          html += '</td>';
+        });
+        const qC = qoldi > 0 ? '#E24B4A' : '#1D9E75';
+        html += '<td style="padding:6px 4px;text-align:center;font-weight:600;font-size:13px;color:'+qC+';">'+qoldi+'</td></tr>';
+      });
+      // Jami
+      const tR = {};
+      STAGES.forEach(s=>{tR[s]=0;});
+      sorted.forEach(([_,p])=>{ STAGES.forEach(s=>{tR[s]+=(p.stages[s]?.qty||0);}); });
+      const tQ = Math.max(0, tR.bichuv - (tR.averlok || 0));
+      html += '<tr style="border-top:2px solid var(--surface-3);"><td style="padding:8px 10px;font-weight:600;font-size:12px;position:sticky;left:0;background:var(--bg);z-index:1;">Jami</td>';
+      STAGES.forEach(s=>{ html += '<td style="padding:6px 3px;text-align:center;font-weight:600;font-size:13px;color:'+SC[s]+';">'+(tR[s]||'—')+'</td>'; });
+      html += '<td style="padding:6px 4px;text-align:center;font-weight:700;font-size:14px;color:'+(tQ>0?'#E24B4A':'#1D9E75')+';">'+tQ+'</td></tr>';
+      html += '</tbody></table></div>';
+      if (content) content.innerHTML = html;
+      // Bo'limlar bo'yicha ishchilar
+      const stageW = {};
+      logs.forEach(l => {
+        const s = l.stage || 'averlok';
+        if (s === 'bichuv') return;
+        if (!stageW[s]) stageW[s] = new Map();
+        const wN = l.workers?.full_name || '—';
+        const cur = stageW[s].get(wN) || { qty:0, amount:0 };
+        cur.qty += Number(l.quantity||0);
+        cur.amount += Number(l.total_amount||0);
+        stageW[s].set(wN, cur);
+      });
+      let dH = '';
+      STAGES.filter(s=>s!=='bichuv').forEach(s => {
+        const wMap = stageW[s];
+        if (!wMap || !wMap.size) return;
+        dH += '<div class="card" style="padding:10px 14px;margin-bottom:8px;border-left:3px solid '+SC[s]+';border-radius:0;">';
+        dH += '<div style="font-size:13px;font-weight:500;color:'+SC[s]+';margin-bottom:6px;">'+LABELS[s]+'</div>';
+        [...wMap.entries()].sort((a,b)=>b[1].qty-a[1].qty).forEach(([name,data])=>{
+          dH += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--surface-3);">';
+          dH += '<span style="font-size:12px;color:var(--text);">'+UI.esc(name)+'</span>';
+          dH += '<span style="font-size:12px;font-weight:500;color:var(--text);">'+data.qty+' dona · '+UI.num(data.amount)+' so\'m</span></div>';
+        });
+        dH += '</div>';
+      });
+      if (deptDetail) deptDetail.innerHTML = dH || '<div class="empty-mini">Ishchi yozuvlari yo\'q</div>';
     },
   },
 
@@ -6924,12 +7107,15 @@ const Pages = {
           + '</div>';
       }).join('');
 
-      list.querySelectorAll('.item-card[data-admin-id]').forEach(el => {
-        el.addEventListener('click', () => {
-          const a = Pages.admins.cache.find(x => x.id === Number(el.dataset.adminId));
+      if (!list._delegated) {
+        list.addEventListener('click', (e) => {
+          const card = e.target.closest('.item-card[data-admin-id]');
+          if (!card) return;
+          const a = Pages.admins.cache.find(x => x.id === Number(card.dataset.adminId));
           if (a) Pages.admins.openEdit(a);
         });
-      });
+        list._delegated = true;
+      }
     },
 
     openAdd() {
@@ -7112,6 +7298,691 @@ const Pages = {
     },
   },
 
+  // ✂️ ════════════════════════════════════════
+  //    BICHUV SAHIFASI — Maxfiy, faqat admin
+  // ════════════════════════════════════════════
+  bichuv: {
+    filter: 'today',
+    _initialized: false,
+    _products: [],
+    _currentTab: 'logs',
+
+    // ── BOT CONFIG — o'zgartirishingiz mumkin ──
+    BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',       // ← Bot tokeningiz
+    CHANNEL_ID: 'YOUR_CHANNEL_ID_HERE',     // ← Kanal ID (masalan: -1001234567890)
+
+    onEnter() {
+      if (!Pages.bichuv._initialized) {
+        Pages.bichuv._initFilters();
+        Pages.bichuv._initTabs();
+        Pages.bichuv._initialized = true;
+      }
+      document.getElementById('bichuvAddBtn')?.addEventListener('click', () => {
+        if (Pages.bichuv._currentTab === 'products') {
+          Pages.bichuv.openProductSheet();
+        } else {
+          Pages.bichuv.openAddSheet();
+        }
+      });
+      document.getElementById('bProdAddBtn')?.addEventListener('click', () => {
+        Pages.bichuv.openProductSheet();
+      });
+      Pages.bichuv.load();
+    },
+
+    // ── Tab tizimi ──
+    _initTabs() {
+      const tabRow = document.getElementById('bichuvTabs');
+      if (!tabRow) return;
+      tabRow.querySelectorAll('.chip').forEach(c => {
+        c.addEventListener('click', () => {
+          tabRow.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+          c.classList.add('active');
+          const tab = c.dataset.btab;
+          Pages.bichuv._currentTab = tab;
+          TG.haptic('light');
+
+          const logsDiv = document.getElementById('bichuvTabLogs');
+          const prodsDiv = document.getElementById('bichuvTabProducts');
+          const addBtn = document.getElementById('bichuvAddBtn');
+
+          if (tab === 'logs') {
+            if (logsDiv) logsDiv.style.display = 'block';
+            if (prodsDiv) prodsDiv.style.display = 'none';
+            if (addBtn) { addBtn.textContent = '+ Kiritish'; }
+          } else {
+            if (logsDiv) logsDiv.style.display = 'none';
+            if (prodsDiv) prodsDiv.style.display = 'block';
+            if (addBtn) { addBtn.textContent = '+ Mahsulot'; }
+            Pages.bichuv.loadProducts();
+          }
+        });
+      });
+    },
+
+    _initFilters() {
+      document.querySelectorAll('#bichuvFilter .chip').forEach(c => {
+        c.addEventListener('click', () => {
+          document.querySelectorAll('#bichuvFilter .chip').forEach(x => x.classList.remove('active'));
+          c.classList.add('active');
+          Pages.bichuv.filter = c.dataset.bfilter;
+          TG.haptic('light'); Sound.tap();
+          Pages.bichuv.load();
+        });
+      });
+    },
+
+    _dateRange() {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today.getTime() + 86400000);
+      if (Pages.bichuv.filter === 'today') return { from: today, to: tomorrow };
+      if (Pages.bichuv.filter === 'week') return { from: new Date(today.getTime() - 6 * 86400000), to: tomorrow };
+      if (Pages.bichuv.filter === 'month') return { from: new Date(today.getTime() - 29 * 86400000), to: tomorrow };
+      return null; // all
+    },
+
+    async load() {
+      const list = document.getElementById('bichuvList');
+      const todayQtyEl = document.getElementById('bichuvTodayQty');
+      const todayAmtEl = document.getElementById('bichuvTodayAmt');
+      const statEl = document.getElementById('bichuvTodayStat');
+      const badgeEl = document.getElementById('bichuv-today-badge');
+
+      if (list) list.innerHTML = `<div class="empty-mini">${I18N.t('loading')}</div>`;
+
+      try {
+        const sb = State.supabase;
+
+        // Bichuv mahsulotlarini yuklash (birinchi marta)
+        if (!Pages.bichuv._products.length) {
+          const { data: prods } = await sb.from('products')
+            .select('id, name, price_per_unit, price, code')
+            .eq('is_bichuv_product', true)
+            .eq('is_active', true)
+            .order('name');
+          Pages.bichuv._products = (prods || []).map(p => ({
+            ...p,
+            price_per_unit: p.price_per_unit || p.price || 0,
+          }));
+        }
+
+        // Bugungi stat (har doim)
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const todayEnd = new Date(todayStart.getTime() + 86400000);
+
+        const { data: todayLogs } = await sb.from('work_logs')
+          .select('quantity, total_amount')
+          .eq('is_private', true)
+          .gte('created_at', todayStart.toISOString())
+          .lt('created_at', todayEnd.toISOString());
+
+        const tQty = (todayLogs || []).reduce((s, l) => s + Number(l.quantity || 0), 0);
+        const tAmt = (todayLogs || []).reduce((s, l) => s + Number(l.total_amount || 0), 0);
+
+        if (todayQtyEl) todayQtyEl.textContent = tQty;
+        if (todayAmtEl) todayAmtEl.textContent = UI.num(tAmt);
+        if (statEl) statEl.textContent = `Bugun: ${tQty} dona · ${UI.num(tAmt)} so'm`;
+        if (badgeEl) {
+          if (tQty > 0) {
+            badgeEl.textContent = `${tQty} dona`;
+            badgeEl.style.display = 'block';
+          } else {
+            badgeEl.style.display = 'none';
+          }
+        }
+
+        // Filter bo'yicha yuklash
+        let query = sb.from('work_logs')
+          .select('id, quantity, total_amount, note, created_at, products(name, code, price_per_unit)')
+          .eq('is_private', true)
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        const range = Pages.bichuv._dateRange();
+        if (range) {
+          query = query.gte('created_at', range.from.toISOString()).lt('created_at', range.to.toISOString());
+        }
+
+        const { data: logs, error } = await query;
+        if (error) throw error;
+
+        Pages.bichuv.render(logs || []);
+      } catch(e) {
+        console.error(e);
+        if (list) list.innerHTML = `<div class="empty-mini">${I18N.t('error')}</div>`;
+      }
+    },
+
+    render(logs) {
+      const list = document.getElementById('bichuvList');
+      if (!list) return;
+
+      if (!logs.length) {
+        list.innerHTML = `
+          <div class="page-stub">
+            <div class="page-stub__icon">
+              <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+            </div>
+            <div class="page-stub__title">Yozuv yo'q</div>
+            <div class="page-stub__text">+ Kiritish tugmasi bilan ish kiriting</div>
+          </div>`;
+        return;
+      }
+
+      // Kunlar bo'yicha guruh
+      const groups = new Map();
+      const months = ['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentyabr','oktyabr','noyabr','dekabr'];
+      logs.forEach(l => {
+        const d = new Date(l.created_at);
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        const label = `${d.getDate()} ${months[d.getMonth()]}`;
+        if (!groups.has(key)) groups.set(key, { label, items: [] });
+        groups.get(key).items.push(l);
+      });
+
+      let html = '';
+      groups.forEach(({ label, items }) => {
+        const dayQty = items.reduce((s, l) => s + Number(l.quantity || 0), 0);
+        const dayAmt = items.reduce((s, l) => s + Number(l.total_amount || 0), 0);
+        html += `
+          <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 4px 4px;margin-top:4px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-2);font-weight:500;">${label}</div>
+            <div style="font-size:11px;color:var(--text-2);">${dayQty} dona · ${UI.num(dayAmt)}</div>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">`;
+
+        items.forEach((l, idx) => {
+          const t = new Date(l.created_at);
+          const timeStr = (t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
+          const prodName = l.products?.name || '—';
+          const prodCode = l.products?.code || '';
+          html += `
+            <div class="log-row" style="padding:12px 14px;${idx > 0 ? 'border-top:0.5px solid var(--surface-3);' : ''}" data-bid="${l.id}">
+              <div class="log-icon" style="background:rgba(255,59,48,0.10);">
+                <svg viewBox="0 0 24 24" style="stroke:#FF3B30;"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+              </div>
+              <div class="log-body">
+                <div class="log-name">${UI.esc(prodName)}${prodCode ? ' <span style="font-size:10px;color:var(--text-2);font-family:monospace;">['+UI.esc(prodCode)+']</span>' : ''}</div>
+                <div class="log-meta">${timeStr}${l.note ? ' · ' + UI.esc(l.note) : ''}</div>
+              </div>
+              <div class="log-amount">
+                <div class="log-amount__value">${UI.num(l.total_amount)}</div>
+                <div class="log-amount__qty">${l.quantity} dona</div>
+              </div>
+            </div>`;
+        });
+        html += `</div>`;
+      });
+
+      list.innerHTML = html;
+
+      // Har bir qatorga click — tahrirlash/o'chirish
+      list.querySelectorAll('[data-bid]').forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', async () => {
+          const id = Number(el.dataset.bid);
+          const log = logs.find(l => l.id === id);
+          if (log) Pages.bichuv.openEditSheet(log);
+        });
+      });
+    },
+
+    async openAddSheet() {
+      const prods = Pages.bichuv._products;
+      if (!prods.length) {
+        UI.toast('Avval mahsulot qo\'shing', 'error'); return;
+      }
+
+      TG.haptic('medium'); Sound.tap();
+
+      const prodOptions = prods.map(p =>
+        `<option value="${p.id}" data-price="${p.price_per_unit || 0}">${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} so'm</option>`
+      ).join('');
+
+      Sheet.open({
+        title: '✂️ Bichuv kiritish',
+        body: `
+          <div class="field">
+            <div class="field__label">Mahsulot</div>
+            <select class="field__select" id="bProd">
+              <option value="">Tanlang...</option>
+              ${prodOptions}
+            </select>
+          </div>
+          <div class="field">
+            <div class="field__label">Miqdor (dona)</div>
+            <input type="number" inputmode="numeric" class="field__input" id="bQty" placeholder="0" min="1" style="font-size:24px;font-weight:500;text-align:center;">
+          </div>
+          <div id="bTotalWrap" style="text-align:center;padding:8px 0 16px;font-size:16px;color:var(--text-2);display:none;">
+            Jami: <span id="bTotalVal" style="font-weight:600;color:var(--text);">—</span>
+          </div>
+          <div class="field">
+            <div class="field__label">Izoh (ixtiyoriy)</div>
+            <input type="text" class="field__input" id="bNote" placeholder="Qo'shimcha ma'lumot...">
+          </div>
+          <div class="sheet__actions">
+            <button class="btn btn--primary btn--full" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
+              Saqlash
+            </button>
+          </div>
+        `,
+      });
+
+      // Live total hisoblash
+      const calcTotal = () => {
+        const prodEl = document.getElementById('bProd');
+        const qtyEl = document.getElementById('bQty');
+        const totalWrap = document.getElementById('bTotalWrap');
+        const totalVal = document.getElementById('bTotalVal');
+        const selOpt = prodEl?.options[prodEl.selectedIndex];
+        const price = Number(selOpt?.dataset.price || 0);
+        const qty = Number(qtyEl?.value || 0);
+        if (price > 0 && qty > 0 && totalWrap && totalVal) {
+          totalWrap.style.display = 'block';
+          totalVal.textContent = UI.num(price * qty) + ' so\'m';
+        } else if (totalWrap) {
+          totalWrap.style.display = 'none';
+        }
+      };
+      document.getElementById('bProd')?.addEventListener('change', calcTotal);
+      document.getElementById('bQty')?.addEventListener('input', calcTotal);
+
+      document.getElementById('bSaveBtn')?.addEventListener('click', () => Pages.bichuv.save());
+    },
+
+    async save(editId = null) {
+      const prodEl = document.getElementById('bProd');
+      const qtyEl = document.getElementById('bQty');
+      const noteEl = document.getElementById('bNote');
+      const btn = document.getElementById('bSaveBtn');
+
+      const prodId = Number(prodEl?.value);
+      const qty = Number(qtyEl?.value);
+      const note = noteEl?.value.trim() || null;
+
+      if (!prodId) { UI.toast('Mahsulot tanlang', 'error'); TG.hapticNotify('error'); return; }
+      if (!qty || qty < 1) { UI.toast('Miqdor 1 dan kam bo\'lmasin', 'error'); TG.hapticNotify('error'); return; }
+
+      const selOpt = prodEl.options[prodEl.selectedIndex];
+      const price = Number(selOpt?.dataset.price || 0);
+      const totalAmount = price * qty;
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
+
+      try {
+        const sb = State.supabase;
+        let error;
+
+        if (editId) {
+          ({ error } = await sb.from('work_logs').update({
+            product_id: prodId,
+            quantity: qty,
+            total_amount: totalAmount,
+            note,
+          }).eq('id', editId));
+        } else {
+          ({ error } = await sb.from('work_logs').insert({
+            product_id: prodId,
+            worker_id: null,
+            quantity: qty,
+            total_amount: totalAmount,
+            note,
+            is_private: true,
+            added_by: 'admin_bichuv',
+            stage: 'bichuv',
+          }));
+        }
+
+        if (error) throw error;
+
+        // Telegram kanalga xabar yuborish
+        const prodName = Pages.bichuv._products.find(p => p.id === prodId)?.name || '—';
+        await Pages.bichuv.sendToChannel({ prodName, qty, totalAmount, note, isEdit: !!editId });
+
+        TG.hapticNotify('success'); Sound.success();
+        UI.toast(editId ? 'Yangilandi ✓' : 'Saqlandi ✓', 'success');
+        Sheet.close();
+        Pages.bichuv.load();
+      } catch(e) {
+        console.error(e);
+        UI.toast(I18N.t('error_save'), 'error');
+        TG.hapticNotify('error'); Sound.error();
+        if (btn) { btn.disabled = false; btn.textContent = 'Saqlash'; }
+      }
+    },
+
+    openEditSheet(log) {
+      TG.haptic('medium'); Sound.tap();
+
+      const prods = Pages.bichuv._products;
+      const prodOptions = prods.map(p =>
+        `<option value="${p.id}" data-price="${p.price_per_unit || 0}" ${p.id === log.product_id ? 'selected' : ''}>${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} so'm</option>`
+      ).join('');
+
+      const t = new Date(log.created_at);
+      const timeStr = (t.getDate()+'.'+(t.getMonth()+1)+'.'+t.getFullYear()) + ' ' + (t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
+
+      Sheet.open({
+        title: '✂️ Bichuv tahrirlash',
+        subtitle: timeStr,
+        body: `
+          <div class="field">
+            <div class="field__label">Mahsulot</div>
+            <select class="field__select" id="bProd">
+              ${prodOptions}
+            </select>
+          </div>
+          <div class="field">
+            <div class="field__label">Miqdor (dona)</div>
+            <input type="number" inputmode="numeric" class="field__input" id="bQty" value="${log.quantity}" min="1" style="font-size:24px;font-weight:500;text-align:center;">
+          </div>
+          <div id="bTotalWrap" style="text-align:center;padding:8px 0 16px;font-size:16px;color:var(--text-2);">
+            Jami: <span id="bTotalVal" style="font-weight:600;color:var(--text);">${UI.num(log.total_amount)} so'm</span>
+          </div>
+          <div class="field">
+            <div class="field__label">Izoh (ixtiyoriy)</div>
+            <input type="text" class="field__input" id="bNote" value="${UI.esc(log.note || '')}">
+          </div>
+          <div class="sheet__actions">
+            <button class="btn btn--danger-outline" id="bDeleteBtn">O'chirish</button>
+            <button class="btn btn--primary" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">Saqlash</button>
+          </div>
+        `,
+      });
+
+      // Live total
+      const calcTotal = () => {
+        const prodEl = document.getElementById('bProd');
+        const qtyEl = document.getElementById('bQty');
+        const totalVal = document.getElementById('bTotalVal');
+        const selOpt = prodEl?.options[prodEl.selectedIndex];
+        const price = Number(selOpt?.dataset.price || 0);
+        const qty = Number(qtyEl?.value || 0);
+        if (totalVal) totalVal.textContent = UI.num(price * qty) + ' so\'m';
+      };
+      document.getElementById('bProd')?.addEventListener('change', calcTotal);
+      document.getElementById('bQty')?.addEventListener('input', calcTotal);
+
+      document.getElementById('bSaveBtn')?.addEventListener('click', () => Pages.bichuv.save(log.id));
+      document.getElementById('bDeleteBtn')?.addEventListener('click', () => Pages.bichuv.delete(log.id));
+    },
+
+    async delete(id) {
+      const ok = await TG.confirm('Bu yozuvni o\'chirmoqchimisiz?');
+      if (!ok) return;
+      try {
+        const { error } = await State.supabase.from('work_logs').delete().eq('id', id).eq('is_private', true);
+        if (error) throw error;
+        TG.hapticNotify('success'); Sound.success();
+        UI.toast('O\'chirildi', 'success');
+        Sheet.close();
+        Pages.bichuv.load();
+      } catch(e) {
+        UI.toast(I18N.t('error'), 'error'); Sound.error();
+      }
+    },
+
+    // ── Telegram kanalga xabar yuborish ──
+    async sendToChannel({ prodName, qty, totalAmount, note, isEdit }) {
+      try {
+        const token = Pages.bichuv.BOT_TOKEN;
+        const chatId = Pages.bichuv.CHANNEL_ID;
+        if (!token || token === 'YOUR_BOT_TOKEN_HERE' || !chatId || chatId === 'YOUR_CHANNEL_ID_HERE') {
+          console.warn('[Bichuv] Bot token yoki kanal ID sozlanmagan');
+          return;
+        }
+
+        const now = new Date();
+        const timeStr = `${now.getDate()}.${now.getMonth()+1}.${now.getFullYear()} ${(now.getHours()<10?'0':'')+now.getHours()}:${(now.getMinutes()<10?'0':'')+now.getMinutes()}`;
+        const adminName = State.admin?.full_name || State.user?.first_name || 'Admin';
+
+        const text = [
+          isEdit ? '✏️ *BICHUV TAHRIRLANDI*' : '✂️ *BICHUV KIRITILDI*',
+          '',
+          `📦 Mahsulot: *${prodName}*`,
+          `🔢 Miqdor: *${qty} dona*`,
+          `💰 Summa: *${UI.num(totalAmount)} so'm*`,
+          note ? `📝 Izoh: ${note}` : '',
+          '',
+          `👤 ${adminName}`,
+          `⏰ ${timeStr}`,
+        ].filter(Boolean).join('\n');
+
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            parse_mode: 'Markdown',
+          }),
+        });
+      } catch(e) {
+        console.warn('[Bichuv] Kanal xabari yuborilmadi:', e);
+        // Xabar ketmasa ham saqlanishga to'sqinlik qilmaymiz
+      }
+    },
+
+    // ══════════════════════════════════════════
+    //   BICHUV MAHSULOTLARI — CRUD
+    // ══════════════════════════════════════════
+
+    async loadProducts() {
+      const list = document.getElementById('bProdList');
+      const countEl = document.getElementById('bProdCount');
+      if (list) list.innerHTML = `<div class="empty-mini">${I18N.t('loading')}</div>`;
+
+      try {
+        const sb = State.supabase;
+        const { data, error } = await sb.from('products')
+          .select('id, name, code, price, price_per_unit, is_active')
+          .eq('is_bichuv_product', true)
+          .order('name');
+        if (error) throw error;
+
+        const prods = data || [];
+        Pages.bichuv._products = prods.map(p => ({
+          ...p,
+          price_per_unit: p.price_per_unit || p.price || 0,
+        }));
+
+        if (countEl) countEl.textContent = `${prods.length} ta mahsulot`;
+        Pages.bichuv.renderProducts(prods);
+      } catch(e) {
+        console.error('Bichuv products load error:', e);
+        if (list) list.innerHTML = `<div class="empty-mini">${I18N.t('error')}</div>`;
+      }
+    },
+
+    renderProducts(prods) {
+      const list = document.getElementById('bProdList');
+      if (!list) return;
+
+      if (!prods.length) {
+        list.innerHTML = `
+          <div class="page-stub">
+            <div class="page-stub__icon">
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            </div>
+            <div class="page-stub__title">Mahsulot yo'q</div>
+            <div class="page-stub__text">+ Mahsulot tugmasi bilan yangi qo'shing</div>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = prods.map(p => {
+        const price = p.price_per_unit || p.price || 0;
+        return `
+          <div class="item-card ${p.is_active ? '' : 'inactive'}" data-bpid="${p.id}" style="cursor:pointer;">
+            <div class="avatar" style="background:rgba(255,59,48,0.12);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FF3B30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            </div>
+            <div class="item-card__body">
+              <div class="item-card__name">
+                <span>${UI.esc(p.name || '—')}</span>
+                ${p.code ? `<span class="code-chip">${UI.esc(p.code)}</span>` : ''}
+                ${p.is_active === false ? '<span class="badge badge--gray">Nofaol</span>' : ''}
+              </div>
+              <div class="item-card__meta" style="color:var(--text-2);font-size:11px;">${UI.num(price)} so'm / dona</div>
+            </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        `;
+      }).join('');
+
+      list.querySelectorAll('[data-bpid]').forEach(el => {
+        el.addEventListener('click', () => {
+          const p = prods.find(x => x.id === Number(el.dataset.bpid));
+          if (p) Pages.bichuv.openProductSheet(p);
+        });
+      });
+    },
+
+    openProductSheet(product = null) {
+      TG.haptic('medium'); Sound.tap();
+      const isEdit = !!product;
+      const title = isEdit ? '📦 Mahsulot tahrirlash' : '📦 Yangi bichuv mahsuloti';
+
+      Sheet.open({
+        title,
+        body: `
+          <div class="field">
+            <div class="field__label">Mahsulot nomi *</div>
+            <input type="text" class="field__input" id="bpName" value="${isEdit ? UI.esc(product.name || '') : ''}" placeholder="Masalan: Ko'ylak mato">
+          </div>
+          <div class="field">
+            <div class="field__label">Kod (ixtiyoriy)</div>
+            <input type="text" class="field__input" id="bpCode" value="${isEdit ? UI.esc(product.code || '') : ''}" placeholder="KM-01" style="font-family:monospace;">
+          </div>
+          <div class="field">
+            <div class="field__label">Narx (so'm / dona) *</div>
+            <input type="number" inputmode="numeric" class="field__input" id="bpPrice" value="${isEdit ? (product.price_per_unit || product.price || 0) : ''}" placeholder="0" min="0" style="font-size:20px;font-weight:500;text-align:center;">
+          </div>
+          ${isEdit ? `
+          <div class="field">
+            <div class="field__label">Holati</div>
+            <div style="display:flex;gap:8px;margin-top:4px;">
+              <label style="flex:1;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;border:1.5px solid ${product.is_active !== false ? '#FF3B30' : 'var(--surface-3)'};background:${product.is_active !== false ? 'rgba(255,59,48,0.06)' : 'transparent'};cursor:pointer;font-size:13px;" id="bpActiveLabel">
+                <input type="radio" name="bpStatus" value="true" ${product.is_active !== false ? 'checked' : ''} style="accent-color:#FF3B30;"> Faol
+              </label>
+              <label style="flex:1;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;border:1.5px solid ${product.is_active === false ? 'var(--text-2)' : 'var(--surface-3)'};background:${product.is_active === false ? 'rgba(128,128,128,0.06)' : 'transparent'};cursor:pointer;font-size:13px;" id="bpInactiveLabel">
+                <input type="radio" name="bpStatus" value="false" ${product.is_active === false ? 'checked' : ''}> Nofaol
+              </label>
+            </div>
+          </div>
+          ` : ''}
+          <div class="sheet__actions">
+            ${isEdit ? '<button class="btn btn--danger-outline" id="bpDeleteBtn">O\'chirish</button>' : ''}
+            <button class="btn btn--primary ${isEdit ? '' : 'btn--full'}" id="bpSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
+              ${isEdit ? 'Saqlash' : 'Qo\'shish'}
+            </button>
+          </div>
+        `,
+      });
+
+      // Radio visual toggle
+      document.querySelectorAll('input[name="bpStatus"]').forEach(r => {
+        r.addEventListener('change', () => {
+          const aLbl = document.getElementById('bpActiveLabel');
+          const iLbl = document.getElementById('bpInactiveLabel');
+          if (r.value === 'true' && r.checked) {
+            if (aLbl) { aLbl.style.borderColor = '#FF3B30'; aLbl.style.background = 'rgba(255,59,48,0.06)'; }
+            if (iLbl) { iLbl.style.borderColor = 'var(--surface-3)'; iLbl.style.background = 'transparent'; }
+          } else if (r.value === 'false' && r.checked) {
+            if (iLbl) { iLbl.style.borderColor = 'var(--text-2)'; iLbl.style.background = 'rgba(128,128,128,0.06)'; }
+            if (aLbl) { aLbl.style.borderColor = 'var(--surface-3)'; aLbl.style.background = 'transparent'; }
+          }
+        });
+      });
+
+      // Save
+      document.getElementById('bpSaveBtn')?.addEventListener('click', () => Pages.bichuv.saveProduct(isEdit ? product.id : null));
+
+      // Delete
+      if (isEdit) {
+        document.getElementById('bpDeleteBtn')?.addEventListener('click', () => Pages.bichuv.deleteProduct(product.id));
+      }
+    },
+
+    async saveProduct(editId = null) {
+      const nameEl = document.getElementById('bpName');
+      const codeEl = document.getElementById('bpCode');
+      const priceEl = document.getElementById('bpPrice');
+      const btn = document.getElementById('bpSaveBtn');
+
+      const name = nameEl?.value.trim();
+      const code = codeEl?.value.trim() || null;
+      const price = Number(priceEl?.value);
+
+      if (!name) { UI.toast('Mahsulot nomini kiriting', 'error'); TG.hapticNotify('error'); return; }
+      if (!price || price < 0) { UI.toast('Narxni kiriting', 'error'); TG.hapticNotify('error'); return; }
+
+      if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
+
+      try {
+        const sb = State.supabase;
+        const data = {
+          name,
+          code,
+          price: price,
+          price_per_unit: price,
+          is_bichuv_product: true,
+          is_active: true,
+        };
+
+        // Holat (tahrirlashda)
+        if (editId) {
+          const statusEl = document.querySelector('input[name="bpStatus"]:checked');
+          data.is_active = statusEl?.value !== 'false';
+        }
+
+        let error;
+        if (editId) {
+          ({ error } = await sb.from('products').update(data).eq('id', editId));
+        } else {
+          ({ error } = await sb.from('products').insert(data));
+        }
+        if (error) throw error;
+
+        TG.hapticNotify('success'); Sound.success();
+        UI.toast(editId ? 'Yangilandi ✓' : 'Qo\'shildi ✓', 'success');
+        Sheet.close();
+
+        // Refresh
+        Pages.bichuv._products = [];
+        Pages.bichuv.loadProducts();
+      } catch(e) {
+        console.error(e);
+        UI.toast(I18N.t('error_save'), 'error');
+        TG.hapticNotify('error'); Sound.error();
+        if (btn) { btn.disabled = false; btn.textContent = editId ? 'Saqlash' : 'Qo\'shish'; }
+      }
+    },
+
+    async deleteProduct(id) {
+      const ok = await TG.confirm('Bu mahsulotni o\'chirmoqchimisiz?\n\nBu mahsulotga bog\'langan yozuvlar ham o\'chadi!');
+      if (!ok) return;
+
+      try {
+        const { error } = await State.supabase.from('products').delete().eq('id', id);
+        if (error) throw error;
+
+        TG.hapticNotify('success'); Sound.success();
+        UI.toast('O\'chirildi', 'success');
+        Sheet.close();
+
+        Pages.bichuv._products = [];
+        Pages.bichuv.loadProducts();
+      } catch(e) {
+        console.error(e);
+        UI.toast('O\'chirib bo\'lmadi — bog\'langan yozuvlar bormi?', 'error');
+        Sound.error();
+      }
+    },
+  },
+
   ai: {
     _messages: [],
     _loading: false,
@@ -7211,8 +8082,6 @@ const Pages = {
         const welcome = el.querySelector('.ai-welcome');
         if (welcome) welcome.style.display = '';
         el.querySelectorAll('.ai-msg, .ai-typing-wrap').forEach(m => m.remove());
-
-        // Clear tugmasini yashirish
         const clearBtn = document.getElementById('aiClearBtn');
         if (clearBtn) clearBtn.classList.remove('visible');
         return;
@@ -7224,7 +8093,10 @@ const Pages = {
 
       el.querySelectorAll('.ai-msg, .ai-typing-wrap').forEach(m => m.remove());
 
-      Pages.ai._messages.forEach((m, i) => {
+      // DocumentFragment — bir marta DOM ga qo'shish
+      const frag = document.createDocumentFragment();
+
+      Pages.ai._messages.forEach((m) => {
         const isUser = m.role === 'user';
         const wrapper = document.createElement('div');
 
@@ -7244,7 +8116,6 @@ const Pages = {
         div.appendChild(bubble);
         wrapper.appendChild(div);
 
-        // Vaqt ko'rsatkichi
         const timeDiv = document.createElement('div');
         timeDiv.className = 'ai-msg-time';
         if (isUser) timeDiv.style.textAlign = 'right';
@@ -7252,14 +8123,16 @@ const Pages = {
         timeDiv.textContent = m._time || Pages.ai._formatTime(m._date);
         wrapper.appendChild(timeDiv);
 
-        el.appendChild(wrapper);
+        frag.appendChild(wrapper);
       });
+
+      el.appendChild(frag);
 
       // Chart render
       Pages.ai._renderChart(el);
       el.scrollTop = el.scrollHeight;
 
-      // Clear tugmasini ko'rsatish — mavjud bo'lmasa yaratish
+      // Clear tugmasini ko'rsatish
       let clearBtn = document.getElementById('aiClearBtn');
       if (!clearBtn) {
         clearBtn = document.createElement('button');
@@ -7950,6 +8823,15 @@ const Realtime = {
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') console.log('[Realtime] connected');
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          console.warn('[Realtime] disconnected:', status);
+          Realtime.channel = null;
+          setTimeout(() => {
+            if (Network.isOnline && State.supabase && !Realtime.channel) {
+              Realtime.init();
+            }
+          }, 5000);
+        }
       });
   },
 
@@ -7960,7 +8842,7 @@ const Realtime = {
     Realtime._debounceTimer = setTimeout(() => {
       Realtime.refresh(Realtime._pendingTables);
       Realtime._pendingTables.clear();
-    }, 500);
+    }, 1000);
   },
 
   refresh(tables) {
@@ -7975,6 +8857,7 @@ const Realtime = {
       analytics:   ['work_logs', 'payments', 'payment_adjustments'],
       payments:    ['payments', 'payment_adjustments', 'work_logs'],
       more:        ['departments', 'products'],
+      bichuv:      ['work_logs'],
     };
     const cares = map[current] || [];
     const shouldRefresh = cares.some(t => tables.has(t));
@@ -8075,7 +8958,7 @@ function showApp(admin, user) {
   // Admin info "Yana" sahifasi pastida
   const info = document.getElementById('adminInfo');
   if (info) {
-    info.textContent = `${admin.full_name || user.first_name} · ID ${user.id} · v11.1`;
+    info.textContent = `${admin.full_name || user.first_name} · ID ${user.id} · v14.0`;
   }
 
   // ── Event listeners ──
@@ -8149,8 +9032,10 @@ document.addEventListener('DOMContentLoaded', () => {
   runAuth();
 });
 
-// Expose for debugging
-window.NinaAdmin = { State, TG, DB, UI, Router, Pages, Sheet, Realtime, Network, PTR, I18N, Sound, Picker, Notifications };
+// Expose for debugging (only in dev mode)
+if (CONFIG.DEV_MODE) {
+  window.NinaAdmin = { State, TG, DB, UI, Router, Pages, Sheet, Realtime, Network, PTR, I18N, Sound, Picker, Notifications };
+}
 
 </script>
 </body>
