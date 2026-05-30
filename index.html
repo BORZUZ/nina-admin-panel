@@ -2025,6 +2025,125 @@ body {
   stroke-width: 2.5;
 }
 
+/* ════════════════════════════════════════════════════════════════
+   STEPPER — Telegram-style +/- miqdor tanlash
+   ════════════════════════════════════════════════════════════════ */
+.stepper {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.stepper:focus-within { border-color: var(--accent); }
+.stepper__btn {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+  user-select: none;
+}
+.stepper__btn:active { background: var(--accent-bg); }
+.stepper__btn:disabled { color: var(--text-3); }
+.stepper__val {
+  flex: 1;
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+  padding: 8px 0;
+  font-family: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+}
+.stepper__val::-webkit-inner-spin-button,
+.stepper__val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Stepper dividers */
+.stepper__divider {
+  width: 0.5px;
+  height: 28px;
+  background: var(--surface-3);
+  flex-shrink: 0;
+}
+
+/* ── Worker picker trigger (xuddi mahsulot picker kabi) ── */
+.wpicker-trigger {
+  width: 100%;
+  background: var(--surface-2);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+.wpicker-trigger:active { opacity: 0.85; }
+.wpicker-trigger.has-value { border-color: var(--accent-bg); }
+.wpicker-trigger__avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #FFF;
+  flex-shrink: 0;
+}
+.wpicker-trigger__body { flex: 1; min-width: 0; }
+.wpicker-trigger__name {
+  font-size: 14px; font-weight: 500; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wpicker-trigger__meta {
+  font-size: 11px; color: var(--text-2); margin-top: 1px;
+}
+.wpicker-trigger__placeholder { color: var(--text-2); font-size: 14px; }
+.wpicker-trigger__chevron {
+  width: 14px; height: 14px;
+  stroke: var(--text-2); stroke-width: 2;
+  fill: none; flex-shrink: 0;
+}
+
+/* ── Total bottom (no sticky — Telegram WebApp scroll uchun) ── */
+.total-sticky {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--surface-3);
+}
+
+/* ── Delete section (separated from save) ── */
+.delete-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--surface-3);
+}
+.delete-section .btn {
+  font-size: 12px;
+  padding: 10px;
+  opacity: 0.7;
+}
+.delete-section .btn:active { opacity: 1; }
+
 </style>
 </head>
 <body>
@@ -3303,6 +3422,76 @@ const I18N = {
     auth_not_admin:  { uz: "Sizning Telegram ID admin sifatida ro'yxatda yo'q.", ru: 'Ваш Telegram ID не зарегистрирован как админ.' },
     auth_conn_err:   { uz: 'Ulanish xatosi', ru: 'Ошибка соединения' },
     auth_check_net:  { uz: 'Internet aloqasini tekshiring.', ru: 'Проверьте интернет.' },
+
+    // Formalar uchun umumiy
+    no_dept_sel:     { uz: '— Tanlanmagan', ru: '— Не выбран' },
+    dept_placeholder:{ uz: 'Bo\'lim nomi', ru: 'Название отдела' },
+    prod_placeholder:{ uz: 'Mahsulot nomi', ru: 'Название товара' },
+    prod_name_req:   { uz: 'Mahsulot nomini kiriting', ru: 'Введите название товара' },
+    price_req:       { uz: 'Narxni kiriting',  ru: 'Введите цену' },
+
+    // Adminlar
+    admin_add:       { uz: '+ Admin qo\'shish', ru: '+ Добавить админа' },
+    admin_super_only:{ uz: 'Faqat Super Admin bu sahifani ko\'ra oladi', ru: 'Только Супер Админ может видеть эту страницу' },
+    admin_role:      { uz: 'Roli',            ru: 'Роль' },
+    admin_role_super:{ uz: 'Super Admin',     ru: 'Супер Админ' },
+    admin_role_admin:{ uz: 'Admin — to\'liq boshqaruv', ru: 'Админ — полное управление' },
+    admin_role_viewer:{ uz: 'Faqat ko\'rish', ru: 'Только просмотр' },
+    admin_never:     { uz: 'Hech qachon',     ru: 'Никогда' },
+    admin_you:       { uz: 'SIZ',             ru: 'ВЫ' },
+    admin_nofaol:    { uz: 'NOFAOL',          ru: 'НЕАКТИВЕН' },
+    admin_tg_err:    { uz: 'To\'g\'ri Telegram ID kiriting', ru: 'Введите корректный Telegram ID' },
+    admin_exists:    { uz: 'Bu Telegram ID allaqachon mavjud', ru: 'Этот Telegram ID уже существует' },
+    admin_added:     { uz: 'Admin qo\'shildi', ru: 'Админ добавлен' },
+    admin_no:        { uz: 'Adminlar yo\'q',   ru: 'Нет администраторов' },
+
+    // Ishlab chiqarish
+    prod_cut:        { uz: 'Bichildi',        ru: 'Раскроено' },
+    prod_process:    { uz: 'Jarayonda',       ru: 'В процессе' },
+    prod_done_lbl:   { uz: 'Tayyor',          ru: 'Готово' },
+    prod_conveyer:   { uz: 'Conveyer holati', ru: 'Состояние конвейера' },
+    prod_by_dept:    { uz: 'Bo\'limlar bo\'yicha', ru: 'По отделам' },
+    prod_no_data:    { uz: 'Ma\'lumot topilmadi', ru: 'Данные не найдены' },
+    prod_no_entries: { uz: 'Yozuv yo\'q',     ru: 'Записей нет' },
+    prod_updated:    { uz: 'yangilandi',      ru: 'обновлено' },
+    prod_remaining:  { uz: 'Qoldi',           ru: 'Осталось' },
+    prod_stayed:     { uz: 'turgan',          ru: 'осталось' },
+    prod_total:      { uz: 'Jami',            ru: 'Итого' },
+    prod_item:       { uz: 'Mahsulot',        ru: 'Товар' },
+    prod_no_worker:  { uz: 'Ishchi yozuvlari yo\'q', ru: 'Нет записей рабочих' },
+    prod_sub:        { uz: 'Bugungi jarayon holati', ru: 'Текущий статус производства' },
+    prod_today_stat: { uz: 'Bugungi holat',   ru: 'Текущий статус' },
+
+    // Bichuv
+    bichuv_section:  { uz: '✂️ Bichuv bo\'limi', ru: '✂️ Раскрой' },
+    bichuv_add:      { uz: '+ Kiritish',      ru: '+ Ввод' },
+    bichuv_today_qty:{ uz: 'Bugun (dona)',     ru: 'Сегодня (шт)' },
+    bichuv_today_amt:{ uz: 'Bugun (summa)',    ru: 'Сегодня (сумма)' },
+    bichuv_tab_logs: { uz: '📋 Yozuvlar',     ru: '📋 Записи' },
+    bichuv_tab_prod: { uz: '📦 Mahsulotlar',  ru: '📦 Товары' },
+    bichuv_add_prod: { uz: '+ Mahsulot',      ru: '+ Товар' },
+    bichuv_edit:     { uz: '✂️ Bichuv tahrirlash', ru: '✂️ Редактирование' },
+    bichuv_qty:      { uz: 'Miqdor (dona)',    ru: 'Кол-во (шт)' },
+    bichuv_total:    { uz: 'Jami',             ru: 'Итого' },
+    bichuv_prod_edit:{ uz: '📦 Mahsulot tahrirlash', ru: '📦 Редактирование товара' },
+    bichuv_prod_new: { uz: '📦 Yangi bichuv mahsuloti', ru: '📦 Новый товар раскроя' },
+    bichuv_prod_name:{ uz: 'Mahsulot nomi *',  ru: 'Название товара *' },
+    bichuv_price_per:{ uz: 'Narx (so\'m / dona) *', ru: 'Цена (сум/шт) *' },
+    bichuv_status:   { uz: 'Holati',           ru: 'Статус' },
+    bichuv_del_log:  { uz: 'Bu yozuvni o\'chirmoqchimisiz?', ru: 'Удалить эту запись?' },
+    bichuv_del_prod: { uz: 'Bu mahsulotni o\'chirmoqchimisiz?\n\nBu mahsulotga bog\'langan yozuvlar ham o\'chadi!', ru: 'Удалить этот товар?\n\nСвязанные записи тоже будут удалены!' },
+    bichuv_no_prod:  { uz: 'Mahsulot yo\'q',   ru: 'Нет товаров' },
+    bichuv_no_hint:  { uz: '+ Mahsulot tugmasi bilan yangi qo\'shing', ru: 'Добавьте с кнопкой + Товар' },
+    bichuv_updated:  { uz: 'Yangilandi ✓',    ru: 'Обновлено ✓' },
+    bichuv_saved:    { uz: 'Saqlandi ✓',      ru: 'Сохранено ✓' },
+    bichuv_del_fail: { uz: 'O\'chirib bo\'lmadi — bog\'langan yozuvlar bormi?', ru: 'Не удалось удалить — есть связанные записи?' },
+    bichuv_home_no:  { uz: 'Bugun hali kiritilmagan', ru: 'Сегодня ещё не вводили' },
+
+    // Home sahifa
+    today_top:       { uz: 'Bugungi TOP',     ru: 'ТОП сегодня' },
+    see_all:         { uz: 'Hammasi',         ru: 'Все' },
+    last_entry:      { uz: 'So\'nggi yozuv',  ru: 'Последняя запись' },
+    chart_total_lbl: { uz: 'Oxirgi 30 kun',   ru: 'Последние 30 дней' },
   },
 
   init() {
@@ -3739,8 +3928,138 @@ const Picker = {
 };
 
 function initPicker() {
-  document.getElementById('pickerClose').addEventListener('click', () => Picker.close());
+  document.getElementById('pickerClose').addEventListener('click', () => {
+    // Qaysi picker ochiq bo'lsa shuni yopamiz
+    if (WorkerPicker._isOpen) { WorkerPicker.close(); }
+    else { Picker.close(); }
+  });
 }
+
+// ─────────────────────────────────────────
+// WORKER PICKER — Ishchi tanlash (Picker patternida)
+// ─────────────────────────────────────────
+const WorkerPicker = {
+  _isOpen: false,
+  _workers: [],
+  _selectedId: null,
+  _onSelect: null,
+  _search: '',
+  _searchTimer: null,
+  _deptCache: [],
+
+  open({ workers, departments, selectedId, onSelect }) {
+    WorkerPicker._workers = workers || [];
+    WorkerPicker._deptCache = departments || [];
+    WorkerPicker._selectedId = selectedId;
+    WorkerPicker._onSelect = onSelect;
+    WorkerPicker._search = '';
+
+    document.getElementById('pickerTitle').textContent = I18N.t('select_worker');
+    WorkerPicker.renderBody();
+
+    document.getElementById('pickerSheet').classList.add('show');
+    WorkerPicker._isOpen = true;
+    TG.haptic('light');
+  },
+
+  close() {
+    document.getElementById('pickerSheet').classList.remove('show');
+    WorkerPicker._isOpen = false;
+    WorkerPicker._search = '';
+  },
+
+  renderBody() {
+    const body = document.getElementById('pickerBody');
+    let workers = WorkerPicker._workers;
+
+    if (WorkerPicker._search) {
+      const q = WorkerPicker._search.toLowerCase();
+      workers = workers.filter(w =>
+        (w.full_name || '').toLowerCase().includes(q) ||
+        (w.phone || '').includes(q) ||
+        String(w.telegram_id || '').includes(q)
+      );
+    }
+
+    // Bo'lim bo'yicha guruhlash
+    const grouped = new Map();
+    const noDept = [];
+    workers.forEach(w => {
+      if (w.department_id) {
+        if (!grouped.has(w.department_id)) grouped.set(w.department_id, []);
+        grouped.get(w.department_id).push(w);
+      } else {
+        noDept.push(w);
+      }
+    });
+
+    let html = '<div class="picker-search"><div class="search-box">'
+      + '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'
+      + '<input type="search" id="wPickerSearch" placeholder="' + I18N.t('search') + '" autocomplete="off">'
+      + '</div></div>';
+
+    if (!workers.length) {
+      html += '<div style="text-align:center;padding:40px 16px;color:var(--text-2);font-size:13px;">' + I18N.t('nothing_found') + '</div>';
+    } else {
+      for (const [deptId, deptWorkers] of grouped) {
+        const dept = WorkerPicker._deptCache.find(d => d.id === deptId);
+        html += '<div class="picker-group-title">' + UI.esc(dept?.name || I18N.t('no_dept')) + '</div>';
+        deptWorkers.forEach(w => { html += WorkerPicker._renderItem(w); });
+      }
+      if (noDept.length) {
+        html += '<div class="picker-group-title">' + I18N.t('no_dept') + '</div>';
+        noDept.forEach(w => { html += WorkerPicker._renderItem(w); });
+      }
+    }
+
+    body.innerHTML = html;
+    WorkerPicker._attachHandlers();
+  },
+
+  _renderItem(w) {
+    const isSelected = WorkerPicker._selectedId === w.id;
+    const initial = (w.full_name || '?').charAt(0);
+    const colorIdx = ((w.id || 0) % 8) + 1;
+    const dept = WorkerPicker._deptCache.find(d => d.id === w.department_id);
+    const meta = (dept ? dept.name : '') + (w.phone ? (dept ? ' · ' : '') + w.phone : '');
+
+    return '<div class="picker-item ' + (isSelected ? 'selected' : '') + '" data-wid="' + w.id + '">'
+      + '<div class="avatar avatar--c' + colorIdx + '" style="width:32px;height:32px;font-size:12px;">' + UI.esc(initial) + '</div>'
+      + '<div class="picker-item__body">'
+      + '<div class="picker-item__name">' + UI.esc(w.full_name || '—') + '</div>'
+      + (meta ? '<div class="picker-item__meta">' + UI.esc(meta) + '</div>' : '')
+      + '</div>'
+      + '<div class="picker-item__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>'
+      + '</div>';
+  },
+
+  _attachHandlers() {
+    const input = document.getElementById('wPickerSearch');
+    if (input) {
+      input.addEventListener('input', (e) => {
+        clearTimeout(WorkerPicker._searchTimer);
+        const v = e.target.value;
+        WorkerPicker._searchTimer = setTimeout(() => {
+          WorkerPicker._search = v.trim();
+          WorkerPicker.renderBody();
+          document.getElementById('wPickerSearch')?.focus();
+        }, 150);
+      });
+    }
+
+    document.querySelectorAll('#pickerBody .picker-item[data-wid]').forEach(el => {
+      el.addEventListener('click', () => {
+        const wid = Number(el.dataset.wid);
+        const w = WorkerPicker._workers.find(x => x.id === wid);
+        if (!w) return;
+        TG.haptic('medium');
+        Sound.select();
+        if (WorkerPicker._onSelect) WorkerPicker._onSelect(w);
+        WorkerPicker.close();
+      });
+    });
+  },
+};
 
 // ─────────────────────────────────────────
 // ROUTER — sahifalar boshqaruvi
@@ -4399,7 +4718,7 @@ const Pages = {
         }
 
         // Chart total
-        document.getElementById('chart-total').textContent = UI.num(monthAmount) + " so'm";
+        document.getElementById('chart-total').textContent = UI.num(monthAmount) + " " + I18N.t('sum_unit');
 
         // ── Sparkline (30 kun) ──
         Pages.home.renderSparkline(monthLogs, days30);
@@ -4981,7 +5300,13 @@ const Pages = {
 
           <div class="field">
             <div class="field__label">${I18N.t('field_qty')}</div>
-            <input type="number" class="field__input" id="editQty" value="${selectedQty}" min="1" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper__btn" id="editQtyMinus">−</button>
+              <div class="stepper__divider"></div>
+              <input type="number" class="stepper__val" id="editQty" value="${selectedQty}" min="1" inputmode="numeric">
+              <div class="stepper__divider"></div>
+              <button type="button" class="stepper__btn" id="editQtyPlus">+</button>
+            </div>
           </div>
 
           <div class="field">
@@ -4997,14 +5322,15 @@ const Pages = {
             <input type="text" class="field__input" id="editNote" value="${UI.esc(log.note || '')}">
           </div>
 
-          <div class="total-box">
-            <span class="total-box__label">${I18N.t('total_amount_lbl')}</span>
-            <span class="total-box__value" id="editTotal">${UI.num((selectedProduct?.price || 0) * selectedQty)} ${I18N.t('sum_unit')}</span>
-          </div>
-
-          <div class="sheet__actions">
-            <button class="btn btn--danger-outline" id="editDelete">${I18N.t('delete')}</button>
-            <button class="btn btn--primary" id="editSave">${I18N.t('save')}</button>
+          <div class="total-sticky">
+            <div class="total-box" style="margin-bottom:10px;">
+              <span class="total-box__label">${I18N.t('total_amount_lbl')}</span>
+              <span class="total-box__value" id="editTotal">${UI.num((selectedProduct?.price || 0) * selectedQty)} ${I18N.t('sum_unit')}</span>
+            </div>
+            <button class="btn btn--primary btn--full" id="editSave">${I18N.t('save')}</button>
+            <div class="delete-section">
+              <button class="btn btn--danger-outline btn--full" id="editDelete">${I18N.t('delete')}</button>
+            </div>
           </div>
         `,
       });
@@ -5021,6 +5347,15 @@ const Pages = {
         const qty = Number(qtyEl.value || 0);
         totalEl.textContent = UI.num(price * qty) + " " + I18N.t('sum_unit');
       };
+
+      // Stepper +/-
+      document.getElementById('editQtyMinus').addEventListener('click', () => {
+        const v = Math.max(1, Number(qtyEl.value || 1) - 1);
+        qtyEl.value = v; recompute(); TG.haptic('light');
+      });
+      document.getElementById('editQtyPlus').addEventListener('click', () => {
+        qtyEl.value = Number(qtyEl.value || 0) + 1; recompute(); TG.haptic('light');
+      });
 
       qtyEl.addEventListener('input', recompute);
 
@@ -5179,10 +5514,6 @@ const Pages = {
         return;
       }
 
-      const workerOptions = Pages.logs.workersCache.map(w =>
-        `<option value="${w.id}" data-dept="${w.department_id || ''}">${UI.esc(w.full_name)}</option>`
-      ).join('');
-
       const deptOptions = Pages.logs.deptCache.map(d =>
         `<option value="${d.id}">${UI.esc(d.name)}</option>`
       ).join('');
@@ -5192,6 +5523,18 @@ const Pages = {
         worker: Pages.logs.workersCache[0] || null,
         product: null,
         foreign: false, // boshqa bo'limdanmi
+      };
+
+      const renderWorkerTrigger = (w) => {
+        if (!w) return '<span class="wpicker-trigger__placeholder">' + I18N.t('select_worker') + '</span>'
+          + '<svg class="wpicker-trigger__chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
+        const initial = (w.full_name || '?').charAt(0);
+        const colorIdx = ((w.id || 0) % 8) + 1;
+        const dept = Pages.logs.deptCache.find(d => d.id === w.department_id);
+        return '<div class="wpicker-trigger__avatar avatar--c' + colorIdx + '">' + UI.esc(initial) + '</div>'
+          + '<div class="wpicker-trigger__body"><div class="wpicker-trigger__name">' + UI.esc(w.full_name) + '</div>'
+          + (dept ? '<div class="wpicker-trigger__meta">' + UI.esc(dept.name) + '</div>' : '') + '</div>'
+          + '<svg class="wpicker-trigger__chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
       };
 
       const renderTrigger = (p, workerDeptId) => {
@@ -5212,9 +5555,9 @@ const Pages = {
         body: `
           <div class="field">
             <div class="field__label">${I18N.t('field_worker')}</div>
-            <select class="field__select" id="addWorker">
-              ${workerOptions}
-            </select>
+            <button type="button" class="wpicker-trigger has-value" id="addWorkerBtn">
+              ${renderWorkerTrigger(state.worker)}
+            </button>
           </div>
 
           <div class="field">
@@ -5227,7 +5570,13 @@ const Pages = {
 
           <div class="field">
             <div class="field__label">${I18N.t('field_qty')}</div>
-            <input type="number" class="field__input" id="addQty" value="1" min="1" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper__btn" id="addQtyMinus">−</button>
+              <div class="stepper__divider"></div>
+              <input type="number" class="stepper__val" id="addQty" value="1" min="1" inputmode="numeric">
+              <div class="stepper__divider"></div>
+              <button type="button" class="stepper__btn" id="addQtyPlus">+</button>
+            </div>
           </div>
 
           <div class="field">
@@ -5243,19 +5592,20 @@ const Pages = {
             <input type="text" class="field__input" id="addNote">
           </div>
 
-          <div class="total-box">
-            <span class="total-box__label">${I18N.t('total_amount_lbl')}</span>
-            <span class="total-box__value" id="addTotal">0 ${I18N.t('sum_unit')}</span>
+          <div class="total-sticky">
+            <div class="total-box" style="margin-bottom:10px;">
+              <span class="total-box__label">${I18N.t('total_amount_lbl')}</span>
+              <span class="total-box__value" id="addTotal">0 ${I18N.t('sum_unit')}</span>
+            </div>
+            <button class="btn btn--primary btn--full" id="addSave">${I18N.t('add')}</button>
           </div>
-
-          <button class="btn btn--primary btn--full" id="addSave">${I18N.t('add')}</button>
         `,
       });
 
-      const workerEl = document.getElementById('addWorker');
       const qtyEl = document.getElementById('addQty');
       const totalEl = document.getElementById('addTotal');
       const triggerEl = document.getElementById('addProductBtn');
+      const workerBtn = document.getElementById('addWorkerBtn');
 
       const recompute = () => {
         const price = Number(state.product?.price || 0);
@@ -5272,12 +5622,28 @@ const Pages = {
         }
       };
 
-      workerEl.addEventListener('change', () => {
-        const wid = Number(workerEl.value);
-        state.worker = Pages.logs.workersCache.find(w => w.id === wid);
-        updateProductDisplay();
-        TG.haptic('light');
-        Sound.tap();
+      // Worker picker
+      workerBtn.addEventListener('click', () => {
+        WorkerPicker.open({
+          workers: Pages.logs.workersCache,
+          departments: Pages.logs.deptCache,
+          selectedId: state.worker?.id || null,
+          onSelect: (w) => {
+            state.worker = w;
+            workerBtn.innerHTML = renderWorkerTrigger(w);
+            workerBtn.classList.add('has-value');
+            updateProductDisplay();
+          },
+        });
+      });
+
+      // Stepper +/-
+      document.getElementById('addQtyMinus').addEventListener('click', () => {
+        const v = Math.max(1, Number(qtyEl.value || 1) - 1);
+        qtyEl.value = v; recompute(); TG.haptic('light');
+      });
+      document.getElementById('addQtyPlus').addEventListener('click', () => {
+        qtyEl.value = Number(qtyEl.value || 0) + 1; recompute(); TG.haptic('light');
       });
 
       qtyEl.addEventListener('input', recompute);
@@ -5301,13 +5667,12 @@ const Pages = {
     },
 
     async saveAdd(state) {
-      const workerEl = document.getElementById('addWorker');
       const qtyEl = document.getElementById('addQty');
       const deptEl = document.getElementById('addDept');
       const noteEl = document.getElementById('addNote');
       const saveBtn = document.getElementById('addSave');
 
-      const workerId = Number(workerEl.value);
+      const workerId = state.worker?.id;
       const product = state.product;
       const qty = Number(qtyEl.value);
       const deptId = deptEl.value ? Number(deptEl.value) : null;
@@ -5596,36 +5961,34 @@ const Pages = {
       }
 
       Sheet.open({
-        title: isNew ? 'Yangi ishchi' : 'Ishchini tahrirlash',
+        title: isNew ? I18N.t('new_worker') : I18N.t('edit_worker'),
         subtitle: isNew ? '' : `ID: ${w.id}`,
         body: `
           ${approvalSection}
 
           <div class="field">
-            <div class="field__label">F.I.Sh.</div>
-            <input type="text" class="field__input" id="wFullName" value="${UI.esc(w?.full_name || '')}" placeholder="Familiya Ism">
+            <div class="field__label">${I18N.t('field_fullname')}</div>
+            <input type="text" class="field__input" id="wFullName" value="${UI.esc(w?.full_name || '')}" placeholder="${I18N.t('field_fullname')}">
           </div>
           <div class="field">
-            <div class="field__label">Telefon</div>
+            <div class="field__label">${I18N.t('field_phone')}</div>
             <input type="tel" class="field__input" id="wPhone" value="${UI.esc(w?.phone || '')}" placeholder="+998901234567">
           </div>
           <div class="field">
-            <div class="field__label">Telegram ID (ixtiyoriy)</div>
+            <div class="field__label">${I18N.t('field_tg_id')}</div>
             <input type="number" class="field__input" id="wTgId" value="${w?.telegram_id || ''}" placeholder="123456789">
           </div>
           <div class="field">
-            <div class="field__label">Bo'lim</div>
-            <select class="field__select" id="wDept"><option value="">— Tanlanmagan</option>${deptOpts}</select>
+            <div class="field__label">${I18N.t('no_phone_dept')}</div>
+            <select class="field__select" id="wDept"><option value="">${I18N.t('no_dept_sel')}</option>${deptOpts}</select>
           </div>
           ${approvalSelect}
           <div class="field-row">
-            <span class="field-row__label">Faol</span>
+            <span class="field-row__label">${I18N.t('field_active')}</span>
             <div class="toggle ${(w?.is_active ?? true) ? 'on' : ''}" id="wActive"></div>
           </div>
-          <div class="sheet__actions">
-            ${isNew ? '' : '<button class="btn btn--danger-outline" id="wDelete">O\'chirish</button>'}
-            <button class="btn btn--primary" id="wSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
-          </div>
+          <button class="btn btn--primary btn--full" id="wSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
+          ${isNew ? '' : '<div class="delete-section"><button class="btn btn--danger-outline btn--full" id="wDelete">' + I18N.t('delete') + '</button></div>'}
         `,
       });
 
@@ -5673,7 +6036,7 @@ const Pages = {
       }
 
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Saqlanmoqda...';
+      saveBtn.textContent = I18N.t('saving');
 
       try {
         const sb = State.supabase;
@@ -5845,8 +6208,8 @@ const Pages = {
           homeCard.style.display = 'block';
           if (homeStat) {
             homeStat.textContent = qty > 0
-              ? `Bugun: ${qty} dona · ${UI.num(amt)} so'm`
-              : 'Bugun hali kiritilmagan';
+              ? `Bugun: ${qty} ${I18N.t('pcs')} · ${UI.num(amt)} ${I18N.t('sum_unit')}`
+              : I18N.t('bichuv_home_no');
           }
           if (homeBadge) {
             if (qty > 0) { homeBadge.textContent = `${qty} dona`; homeBadge.style.display = 'block'; }
@@ -5920,20 +6283,18 @@ const Pages = {
     openForm(d) {
       const isNew = !d;
       Sheet.open({
-        title: isNew ? "Yangi bo'lim" : "Bo'limni tahrirlash",
+        title: isNew ? I18N.t('new_dept') : I18N.t('edit_dept'),
         body: `
           <div class="field">
-            <div class="field__label">Nomi</div>
-            <input type="text" class="field__input" id="dName" value="${UI.esc(d?.name || '')}" placeholder="Bo'lim nomi">
+            <div class="field__label">${I18N.t('field_name')}</div>
+            <input type="text" class="field__input" id="dName" value="${UI.esc(d?.name || '')}" placeholder="${I18N.t('dept_placeholder')}">
           </div>
           <div class="field-row">
-            <span class="field-row__label">Faol</span>
+            <span class="field-row__label">${I18N.t('field_active')}</span>
             <div class="toggle ${(d?.is_active ?? true) ? 'on' : ''}" id="dActive"></div>
           </div>
-          <div class="sheet__actions">
-            ${isNew ? '' : '<button class="btn btn--danger-outline" id="dDelete">O\'chirish</button>'}
-            <button class="btn btn--primary" id="dSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
-          </div>
+          <button class="btn btn--primary btn--full" id="dSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
+          ${isNew ? '' : '<div class="delete-section"><button class="btn btn--danger-outline btn--full" id="dDelete">' + I18N.t('delete') + '</button></div>'}
         `,
       });
 
@@ -6103,7 +6464,7 @@ const Pages = {
             </div>
             <div class="item-card__right">
               <div class="item-card__value">${UI.num(p.price)}</div>
-              <div class="item-card__sub">so'm</div>
+              <div class="item-card__sub">${I18N.t('sum_unit')}</div>
             </div>
           </div>
         `;
@@ -6130,32 +6491,30 @@ const Pages = {
       ).join('');
 
       Sheet.open({
-        title: isNew ? 'Yangi mahsulot' : 'Mahsulotni tahrirlash',
+        title: isNew ? I18N.t('new_product') : I18N.t('edit_product'),
         body: `
           <div class="field">
-            <div class="field__label">Nomi</div>
-            <input type="text" class="field__input" id="pName" value="${UI.esc(p?.name || '')}" placeholder="Mahsulot nomi">
+            <div class="field__label">${I18N.t('field_name')}</div>
+            <input type="text" class="field__input" id="pName" value="${UI.esc(p?.name || '')}" placeholder="${I18N.t('prod_placeholder')}">
           </div>
           <div class="field">
-            <div class="field__label">Kod (ixtiyoriy)</div>
+            <div class="field__label">${I18N.t('field_code')}</div>
             <input type="text" class="field__input" id="pCode" value="${UI.esc(p?.code || '')}" placeholder="2001">
           </div>
           <div class="field">
-            <div class="field__label">Narx (so'm)</div>
+            <div class="field__label">${I18N.t('field_price')}</div>
             <input type="number" class="field__input" id="pPrice" value="${p?.price || 0}" min="0" inputmode="numeric">
           </div>
           <div class="field">
-            <div class="field__label">Bo'lim</div>
-            <select class="field__select" id="pDept"><option value="">— Tanlanmagan</option>${deptOpts}</select>
+            <div class="field__label">${I18N.t('no_phone_dept')}</div>
+            <select class="field__select" id="pDept"><option value="">${I18N.t('no_dept_sel')}</option>${deptOpts}</select>
           </div>
           <div class="field-row">
-            <span class="field-row__label">Faol</span>
+            <span class="field-row__label">${I18N.t('field_active')}</span>
             <div class="toggle ${(p?.is_active ?? true) ? 'on' : ''}" id="pActive"></div>
           </div>
-          <div class="sheet__actions">
-            ${isNew ? '' : '<button class="btn btn--danger-outline" id="pDelete">O\'chirish</button>'}
-            <button class="btn btn--primary" id="pSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
-          </div>
+          <button class="btn btn--primary btn--full" id="pSave">${isNew ? I18N.t('add') : I18N.t('save')}</button>
+          ${isNew ? '' : '<div class="delete-section"><button class="btn btn--danger-outline btn--full" id="pDelete">' + I18N.t('delete') + '</button></div>'}
         `,
       });
 
@@ -6987,7 +7346,7 @@ const Pages = {
           if (qty > 0) {
             html += '<div style="font-weight:600;font-size:13px;color:'+SC[s]+';">'+qty+'</div>';
             if (s !== 'bichuv' && idx < STAGES.length - 1 && stayingHere > 0) {
-              html += '<div style="font-size:9px;color:var(--text-2);">'+stayingHere+' turgan</div>';
+              html += '<div style="font-size:9px;color:var(--text-2);">'+stayingHere+' '+I18N.t('prod_stayed')+'</div>';
             }
           } else { html += '<div style="color:var(--text-2);font-size:11px;">—</div>'; }
           html += '</td>';
@@ -7000,7 +7359,7 @@ const Pages = {
       STAGES.forEach(s=>{tR[s]=0;});
       sorted.forEach(([_,p])=>{ STAGES.forEach(s=>{tR[s]+=(p.stages[s]?.qty||0);}); });
       const tQ = Math.max(0, tR.bichuv - (tR.averlok || 0));
-      html += '<tr style="border-top:2px solid var(--surface-3);"><td style="padding:8px 10px;font-weight:600;font-size:12px;position:sticky;left:0;background:var(--bg);z-index:1;">Jami</td>';
+      html += '<tr style="border-top:2px solid var(--surface-3);"><td style="padding:8px 10px;font-weight:600;font-size:12px;position:sticky;left:0;background:var(--bg);z-index:1;">'+I18N.t('prod_total')+'</td>';
       STAGES.forEach(s=>{ html += '<td style="padding:6px 3px;text-align:center;font-weight:600;font-size:13px;color:'+SC[s]+';">'+(tR[s]||'—')+'</td>'; });
       html += '<td style="padding:6px 4px;text-align:center;font-weight:700;font-size:14px;color:'+(tQ>0?'#E24B4A':'#1D9E75')+';">'+tQ+'</td></tr>';
       html += '</tbody></table></div>';
@@ -7026,11 +7385,11 @@ const Pages = {
         [...wMap.entries()].sort((a,b)=>b[1].qty-a[1].qty).forEach(([name,data])=>{
           dH += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--surface-3);">';
           dH += '<span style="font-size:12px;color:var(--text);">'+UI.esc(name)+'</span>';
-          dH += '<span style="font-size:12px;font-weight:500;color:var(--text);">'+data.qty+' dona · '+UI.num(data.amount)+' so\'m</span></div>';
+          dH += '<span style="font-size:12px;font-weight:500;color:var(--text);">'+data.qty+' '+I18N.t('pcs')+' · '+UI.num(data.amount)+' '+I18N.t('sum_unit')+'</span></div>';
         });
         dH += '</div>';
       });
-      if (deptDetail) deptDetail.innerHTML = dH || '<div class="empty-mini">Ishchi yozuvlari yo\'q</div>';
+      if (deptDetail) deptDetail.innerHTML = dH || '<div class="empty-mini">'+I18N.t('prod_no_worker')+'</div>';
     },
   },
 
@@ -7042,7 +7401,7 @@ const Pages = {
     onEnter() {
       // Faqat super_admin ko'ra oladi
       if (State.admin?.role !== 'super_admin') {
-        document.getElementById('adminsList').innerHTML = '<div class="empty-mini">Faqat Super Admin bu sahifani ko\'ra oladi</div>';
+        document.getElementById('adminsList').innerHTML = '<div class="empty-mini">' + I18N.t('admin_super_only') + '</div>';
         return;
       }
       if (!Pages.admins._initialized) {
@@ -7069,18 +7428,18 @@ const Pages = {
       const admins = Pages.admins.cache;
 
       const activeCount = admins.filter(a => a.is_active).length;
-      document.getElementById('adminsCount').innerHTML = '<b>' + activeCount + '</b> faol / ' + admins.length + ' jami';
+      document.getElementById('adminsCount').innerHTML = '<b>' + activeCount + '</b> ' + I18N.t('active_total') + ' / ' + admins.length + ' ' + I18N.t('total');
 
       // Yana sahifasidagi admin count
       const ac = document.getElementById('admins-count');
-      if (ac) ac.textContent = activeCount + ' ta admin';
+      if (ac) ac.textContent = activeCount + ' admin';
 
       if (!admins.length) {
-        list.innerHTML = '<div class="empty-mini">Adminlar yo\'q</div>';
+        list.innerHTML = '<div class="empty-mini">' + I18N.t('admin_no') + '</div>';
         return;
       }
 
-      const roleLabels = { super_admin: 'Super Admin', admin: 'Admin', viewer: 'Faqat ko\'rish' };
+      const roleLabels = { super_admin: I18N.t('admin_role_super'), admin: 'Admin', viewer: I18N.t('admin_role_viewer') };
       const roleColors = { super_admin: 'var(--accent)', admin: 'var(--success)', viewer: 'var(--text-2)' };
 
       list.innerHTML = admins.map(a => {
@@ -7088,7 +7447,7 @@ const Pages = {
         const colorIdx = ((a.id || 0) % 8) + 1;
         const roleLbl = roleLabels[a.role] || a.role;
         const roleClr = roleColors[a.role] || 'var(--text-2)';
-        const lastLogin = a.last_login_at ? new Date(a.last_login_at).toLocaleDateString('uz') : 'Hech qachon';
+        const lastLogin = a.last_login_at ? new Date(a.last_login_at).toLocaleDateString('uz') : I18N.t('admin_never');
         const isSelf = a.telegram_id === State.user?.id;
 
         return '<div class="item-card' + (a.is_active ? '' : ' inactive') + '" data-admin-id="' + a.id + '">'
@@ -7096,8 +7455,8 @@ const Pages = {
           + '<div class="item-card__body">'
           + '<div class="item-card__name">'
           + '<span>' + UI.esc(a.full_name) + '</span>'
-          + (isSelf ? ' <span class="badge badge--success">SIZ</span>' : '')
-          + (!a.is_active ? ' <span class="badge badge--gray">NOFAOL</span>' : '')
+          + (isSelf ? ' <span class="badge badge--success">' + I18N.t('admin_you') + '</span>' : '')
+          + (!a.is_active ? ' <span class="badge badge--gray">' + I18N.t('admin_nofaol') + '</span>' : '')
           + '</div>'
           + '<div class="item-card__meta">ID: ' + a.telegram_id + ' · ' + lastLogin + '</div>'
           + '</div>'
@@ -7126,17 +7485,17 @@ const Pages = {
           + '<input type="number" class="field__input" id="adTgId" placeholder="123456789" inputmode="numeric">'
           + '</div>'
           + '<div class="field">'
-          + '<div class="field__label">F.I.Sh. *</div>'
-          + '<input type="text" class="field__input" id="adName" placeholder="Ism Familiya">'
+          + '<div class="field__label">' + I18N.t('field_fullname') + ' *</div>'
+          + '<input type="text" class="field__input" id="adName" placeholder="' + I18N.t('field_fullname') + '">'
           + '</div>'
           + '<div class="field">'
-          + '<div class="field__label">Roli</div>'
+          + '<div class="field__label">' + I18N.t('admin_role') + '</div>'
           + '<select class="field__select" id="adRole">'
-          + '<option value="admin">Admin — to\'liq boshqaruv</option>'
-          + '<option value="viewer">Viewer — faqat ko\'rish</option>'
+          + '<option value="admin">' + I18N.t('admin_role_admin') + '</option>'
+          + '<option value="viewer">' + I18N.t('admin_role_viewer') + '</option>'
           + '</select>'
           + '</div>'
-          + '<button class="btn btn--primary btn--full" id="adSaveBtn">Qo\'shish</button>',
+          + '<button class="btn btn--primary btn--full" id="adSaveBtn">' + I18N.t('add') + '</button>',
       });
 
       document.getElementById('adSaveBtn').addEventListener('click', () => Pages.admins.saveNew());
@@ -7149,7 +7508,7 @@ const Pages = {
       const btn = document.getElementById('adSaveBtn');
 
       if (!tgId || tgId < 1000) {
-        UI.toast('To\'g\'ri Telegram ID kiriting', 'error');
+        UI.toast(I18N.t('admin_tg_err'), 'error');
         TG.hapticNotify('error'); Sound.error();
         return;
       }
@@ -7162,7 +7521,7 @@ const Pages = {
       // Mavjudligini tekshirish
       const existing = Pages.admins.cache.find(a => a.telegram_id === tgId);
       if (existing) {
-        UI.toast('Bu Telegram ID allaqachon mavjud: ' + existing.full_name, 'error');
+        UI.toast(I18N.t('admin_exists') + ': ' + existing.full_name, 'error');
         TG.hapticNotify('error'); Sound.error();
         return;
       }
@@ -7182,7 +7541,7 @@ const Pages = {
 
         TG.hapticNotify('success');
         Sound.success();
-        UI.toast('Admin qo\'shildi: ' + name, 'success');
+        UI.toast(I18N.t('admin_added') + ': ' + name, 'success');
         Sheet.close();
         Pages.admins.load();
       } catch(e) {
@@ -7532,41 +7891,39 @@ const Pages = {
     async openAddSheet() {
       const prods = Pages.bichuv._products;
       if (!prods.length) {
-        UI.toast('Avval mahsulot qo\'shing', 'error'); return;
+        UI.toast(I18N.t('no_products'), 'error'); return;
       }
 
       TG.haptic('medium'); Sound.tap();
 
       const prodOptions = prods.map(p =>
-        `<option value="${p.id}" data-price="${p.price_per_unit || 0}">${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} so'm</option>`
+        `<option value="${p.id}" data-price="${p.price_per_unit || 0}">${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} ${I18N.t('sum_unit')}</option>`
       ).join('');
 
       Sheet.open({
-        title: '✂️ Bichuv kiritish',
+        title: I18N.t('bichuv_section'),
         body: `
           <div class="field">
-            <div class="field__label">Mahsulot</div>
+            <div class="field__label">${I18N.t('field_product')}</div>
             <select class="field__select" id="bProd">
-              <option value="">Tanlang...</option>
+              <option value="">${I18N.t('select_product')}</option>
               ${prodOptions}
             </select>
           </div>
           <div class="field">
-            <div class="field__label">Miqdor (dona)</div>
+            <div class="field__label">${I18N.t('bichuv_qty')}</div>
             <input type="number" inputmode="numeric" class="field__input" id="bQty" placeholder="0" min="1" style="font-size:24px;font-weight:500;text-align:center;">
           </div>
           <div id="bTotalWrap" style="text-align:center;padding:8px 0 16px;font-size:16px;color:var(--text-2);display:none;">
-            Jami: <span id="bTotalVal" style="font-weight:600;color:var(--text);">—</span>
+            ${I18N.t('bichuv_total')}: <span id="bTotalVal" style="font-weight:600;color:var(--text);">—</span>
           </div>
           <div class="field">
-            <div class="field__label">Izoh (ixtiyoriy)</div>
-            <input type="text" class="field__input" id="bNote" placeholder="Qo'shimcha ma'lumot...">
+            <div class="field__label">${I18N.t('field_note_opt')}</div>
+            <input type="text" class="field__input" id="bNote" placeholder="">
           </div>
-          <div class="sheet__actions">
-            <button class="btn btn--primary btn--full" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
-              Saqlash
-            </button>
-          </div>
+          <button class="btn btn--primary btn--full" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
+            ${I18N.t('save')}
+          </button>
         `,
       });
 
@@ -7581,7 +7938,7 @@ const Pages = {
         const qty = Number(qtyEl?.value || 0);
         if (price > 0 && qty > 0 && totalWrap && totalVal) {
           totalWrap.style.display = 'block';
-          totalVal.textContent = UI.num(price * qty) + ' so\'m';
+          totalVal.textContent = UI.num(price * qty) + ' ' + I18N.t('sum_unit');
         } else if (totalWrap) {
           totalWrap.style.display = 'none';
         }
@@ -7602,14 +7959,14 @@ const Pages = {
       const qty = Number(qtyEl?.value);
       const note = noteEl?.value.trim() || null;
 
-      if (!prodId) { UI.toast('Mahsulot tanlang', 'error'); TG.hapticNotify('error'); return; }
-      if (!qty || qty < 1) { UI.toast('Miqdor 1 dan kam bo\'lmasin', 'error'); TG.hapticNotify('error'); return; }
+      if (!prodId) { UI.toast(I18N.t('select_product'), 'error'); TG.hapticNotify('error'); return; }
+      if (!qty || qty < 1) { UI.toast(I18N.t('qty_min_err'), 'error'); TG.hapticNotify('error'); return; }
 
       const selOpt = prodEl.options[prodEl.selectedIndex];
       const price = Number(selOpt?.dataset.price || 0);
       const totalAmount = price * qty;
 
-      if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
+      if (btn) { btn.disabled = true; btn.textContent = I18N.t('saving'); }
 
       try {
         const sb = State.supabase;
@@ -7642,14 +7999,14 @@ const Pages = {
         await Pages.bichuv.sendToChannel({ prodName, qty, totalAmount, note, isEdit: !!editId });
 
         TG.hapticNotify('success'); Sound.success();
-        UI.toast(editId ? 'Yangilandi ✓' : 'Saqlandi ✓', 'success');
+        UI.toast(editId ? I18N.t('bichuv_updated') : I18N.t('bichuv_saved'), 'success');
         Sheet.close();
         Pages.bichuv.load();
       } catch(e) {
         console.error(e);
         UI.toast(I18N.t('error_save'), 'error');
         TG.hapticNotify('error'); Sound.error();
-        if (btn) { btn.disabled = false; btn.textContent = 'Saqlash'; }
+        if (btn) { btn.disabled = false; btn.textContent = I18N.t('save'); }
       }
     },
 
@@ -7658,37 +8015,35 @@ const Pages = {
 
       const prods = Pages.bichuv._products;
       const prodOptions = prods.map(p =>
-        `<option value="${p.id}" data-price="${p.price_per_unit || 0}" ${p.id === log.product_id ? 'selected' : ''}>${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} so'm</option>`
+        `<option value="${p.id}" data-price="${p.price_per_unit || 0}" ${p.id === log.product_id ? 'selected' : ''}>${UI.esc(p.name)}${p.code ? ' ['+UI.esc(p.code)+']' : ''} — ${UI.num(p.price_per_unit || 0)} ${I18N.t('sum_unit')}</option>`
       ).join('');
 
       const t = new Date(log.created_at);
       const timeStr = (t.getDate()+'.'+(t.getMonth()+1)+'.'+t.getFullYear()) + ' ' + (t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
 
       Sheet.open({
-        title: '✂️ Bichuv tahrirlash',
+        title: I18N.t('bichuv_edit'),
         subtitle: timeStr,
         body: `
           <div class="field">
-            <div class="field__label">Mahsulot</div>
+            <div class="field__label">${I18N.t('field_product')}</div>
             <select class="field__select" id="bProd">
               ${prodOptions}
             </select>
           </div>
           <div class="field">
-            <div class="field__label">Miqdor (dona)</div>
+            <div class="field__label">${I18N.t('bichuv_qty')}</div>
             <input type="number" inputmode="numeric" class="field__input" id="bQty" value="${log.quantity}" min="1" style="font-size:24px;font-weight:500;text-align:center;">
           </div>
           <div id="bTotalWrap" style="text-align:center;padding:8px 0 16px;font-size:16px;color:var(--text-2);">
-            Jami: <span id="bTotalVal" style="font-weight:600;color:var(--text);">${UI.num(log.total_amount)} so'm</span>
+            ${I18N.t('bichuv_total')}: <span id="bTotalVal" style="font-weight:600;color:var(--text);">${UI.num(log.total_amount)} ${I18N.t('sum_unit')}</span>
           </div>
           <div class="field">
-            <div class="field__label">Izoh (ixtiyoriy)</div>
+            <div class="field__label">${I18N.t('field_note_opt')}</div>
             <input type="text" class="field__input" id="bNote" value="${UI.esc(log.note || '')}">
           </div>
-          <div class="sheet__actions">
-            <button class="btn btn--danger-outline" id="bDeleteBtn">O'chirish</button>
-            <button class="btn btn--primary" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">Saqlash</button>
-          </div>
+          <button class="btn btn--primary btn--full" id="bSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">${I18N.t('save')}</button>
+          <div class="delete-section"><button class="btn btn--danger-outline btn--full" id="bDeleteBtn">${I18N.t('delete')}</button></div>
         `,
       });
 
@@ -7700,7 +8055,7 @@ const Pages = {
         const selOpt = prodEl?.options[prodEl.selectedIndex];
         const price = Number(selOpt?.dataset.price || 0);
         const qty = Number(qtyEl?.value || 0);
-        if (totalVal) totalVal.textContent = UI.num(price * qty) + ' so\'m';
+        if (totalVal) totalVal.textContent = UI.num(price * qty) + ' ' + I18N.t('sum_unit');
       };
       document.getElementById('bProd')?.addEventListener('change', calcTotal);
       document.getElementById('bQty')?.addEventListener('input', calcTotal);
@@ -7710,7 +8065,7 @@ const Pages = {
     },
 
     async delete(id) {
-      const ok = await TG.confirm('Bu yozuvni o\'chirmoqchimisiz?');
+      const ok = await TG.confirm(I18N.t('bichuv_del_log'));
       if (!ok) return;
       try {
         const { error } = await State.supabase.from('work_logs').delete().eq('id', id).eq('is_private', true);
@@ -7843,42 +8198,40 @@ const Pages = {
     openProductSheet(product = null) {
       TG.haptic('medium'); Sound.tap();
       const isEdit = !!product;
-      const title = isEdit ? '📦 Mahsulot tahrirlash' : '📦 Yangi bichuv mahsuloti';
+      const title = isEdit ? I18N.t('bichuv_prod_edit') : I18N.t('bichuv_prod_new');
 
       Sheet.open({
         title,
         body: `
           <div class="field">
-            <div class="field__label">Mahsulot nomi *</div>
-            <input type="text" class="field__input" id="bpName" value="${isEdit ? UI.esc(product.name || '') : ''}" placeholder="Masalan: Ko'ylak mato">
+            <div class="field__label">${I18N.t('bichuv_prod_name')}</div>
+            <input type="text" class="field__input" id="bpName" value="${isEdit ? UI.esc(product.name || '') : ''}" placeholder="${I18N.t('prod_placeholder')}">
           </div>
           <div class="field">
-            <div class="field__label">Kod (ixtiyoriy)</div>
+            <div class="field__label">${I18N.t('field_code')}</div>
             <input type="text" class="field__input" id="bpCode" value="${isEdit ? UI.esc(product.code || '') : ''}" placeholder="KM-01" style="font-family:monospace;">
           </div>
           <div class="field">
-            <div class="field__label">Narx (so'm / dona) *</div>
+            <div class="field__label">${I18N.t('bichuv_price_per')}</div>
             <input type="number" inputmode="numeric" class="field__input" id="bpPrice" value="${isEdit ? (product.price_per_unit || product.price || 0) : ''}" placeholder="0" min="0" style="font-size:20px;font-weight:500;text-align:center;">
           </div>
           ${isEdit ? `
           <div class="field">
-            <div class="field__label">Holati</div>
+            <div class="field__label">${I18N.t('bichuv_status')}</div>
             <div style="display:flex;gap:8px;margin-top:4px;">
               <label style="flex:1;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;border:1.5px solid ${product.is_active !== false ? '#FF3B30' : 'var(--surface-3)'};background:${product.is_active !== false ? 'rgba(255,59,48,0.06)' : 'transparent'};cursor:pointer;font-size:13px;" id="bpActiveLabel">
-                <input type="radio" name="bpStatus" value="true" ${product.is_active !== false ? 'checked' : ''} style="accent-color:#FF3B30;"> Faol
+                <input type="radio" name="bpStatus" value="true" ${product.is_active !== false ? 'checked' : ''} style="accent-color:#FF3B30;"> ${I18N.t('field_active')}
               </label>
               <label style="flex:1;display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;border:1.5px solid ${product.is_active === false ? 'var(--text-2)' : 'var(--surface-3)'};background:${product.is_active === false ? 'rgba(128,128,128,0.06)' : 'transparent'};cursor:pointer;font-size:13px;" id="bpInactiveLabel">
-                <input type="radio" name="bpStatus" value="false" ${product.is_active === false ? 'checked' : ''}> Nofaol
+                <input type="radio" name="bpStatus" value="false" ${product.is_active === false ? 'checked' : ''}> ${I18N.t('badge_inactive')}
               </label>
             </div>
           </div>
           ` : ''}
-          <div class="sheet__actions">
-            ${isEdit ? '<button class="btn btn--danger-outline" id="bpDeleteBtn">O\'chirish</button>' : ''}
-            <button class="btn btn--primary ${isEdit ? '' : 'btn--full'}" id="bpSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
-              ${isEdit ? 'Saqlash' : 'Qo\'shish'}
+          <button class="btn btn--primary btn--full" id="bpSaveBtn" style="background:#FF3B30;border-color:#FF3B30;">
+              ${isEdit ? I18N.t('save') : I18N.t('add')}
             </button>
-          </div>
+            ${isEdit ? '<div class="delete-section"><button class="btn btn--danger-outline btn--full" id="bpDeleteBtn">' + I18N.t('delete') + '</button></div>' : ''}
         `,
       });
 
@@ -7916,10 +8269,10 @@ const Pages = {
       const code = codeEl?.value.trim() || null;
       const price = Number(priceEl?.value);
 
-      if (!name) { UI.toast('Mahsulot nomini kiriting', 'error'); TG.hapticNotify('error'); return; }
-      if (!price || price < 0) { UI.toast('Narxni kiriting', 'error'); TG.hapticNotify('error'); return; }
+      if (!name) { UI.toast(I18N.t('prod_name_req'), 'error'); TG.hapticNotify('error'); return; }
+      if (!price || price < 0) { UI.toast(I18N.t('price_req'), 'error'); TG.hapticNotify('error'); return; }
 
-      if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
+      if (btn) { btn.disabled = true; btn.textContent = I18N.t('saving'); }
 
       try {
         const sb = State.supabase;
@@ -7957,12 +8310,12 @@ const Pages = {
         console.error(e);
         UI.toast(I18N.t('error_save'), 'error');
         TG.hapticNotify('error'); Sound.error();
-        if (btn) { btn.disabled = false; btn.textContent = editId ? 'Saqlash' : 'Qo\'shish'; }
+        if (btn) { btn.disabled = false; btn.textContent = editId ? I18N.t('save') : I18N.t('add'); }
       }
     },
 
     async deleteProduct(id) {
-      const ok = await TG.confirm('Bu mahsulotni o\'chirmoqchimisiz?\n\nBu mahsulotga bog\'langan yozuvlar ham o\'chadi!');
+      const ok = await TG.confirm(I18N.t('bichuv_del_prod'));
       if (!ok) return;
 
       try {
@@ -7977,7 +8330,7 @@ const Pages = {
         Pages.bichuv.loadProducts();
       } catch(e) {
         console.error(e);
-        UI.toast('O\'chirib bo\'lmadi — bog\'langan yozuvlar bormi?', 'error');
+        UI.toast(I18N.t('bichuv_del_fail'), 'error');
         Sound.error();
       }
     },
